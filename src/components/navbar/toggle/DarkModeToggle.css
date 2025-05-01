@@ -1,0 +1,354 @@
+*,
+*:after,
+*:before {
+	box-sizing: border-box;
+}
+
+:root {
+	--slide-ease: cubic-bezier(0.4, -0.3, 0.6, 1.3);
+	--easing: var(--slide-ease);
+	--speed: 0.5s;
+	--width: 80px;
+	--ar: 2.5;
+	--ray: hsl(0 0% 100% / 0.5);
+	--sun: hsl(237, 74%, 53%);
+	--moon: hsl(212, 13%, 82%);
+	--crater: hsl(221, 16%, 68%);
+	--bg: hsl(0, 0%, 100%);
+	--bear-speed: 10s;
+	--color: hsl(220, 99%, 40%);
+}
+
+html {
+	color-scheme: light only;
+}
+
+[data-dark-mode="true"] {
+	--bg: hsl(218, 78%, 30%);
+	--color: hsl(219 30% 98%);
+	color-scheme: dark only;
+}
+
+body {
+	display: grid;
+	place-items: center;
+	min-height: 100vh;
+	overflow: hidden;
+	background: var(--bg);
+	transition: background var(--speed) var(--easing);
+	font-family: sans-serif, system-ui;
+}
+
+.toggle__backdrop:first-of-type .clouds path:first-of-type {
+	fill: var(--ray);
+}
+
+.toggle {
+	-webkit-tap-highlight-color: transparent;
+	width: var(--width);
+	height: calc(var(--width) / var(--ar));
+	z-index: 10;
+	will-change: transform;
+	isolation: isolate;
+	transform: translate3d(0, 0, 0);
+	aspect-ratio: var(--ar);
+	border-radius: 100vh;
+	border: 0;
+	position: relative;
+	padding: 0;
+	overflow: hidden;
+	cursor: pointer;
+	transition: background var(--speed) var(--easing);
+	background: var(--surface);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle:after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+	border-radius: 100vh;
+}
+
+.toggle__content {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	border-radius: 100vh;
+	display: block;
+	clip-path: inset(0 0 0 0 round 100vh);
+	container-type: inline-size;
+}
+
+.toggle__backdrop {
+	overflow: visible !important;
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	left: 0;
+	transition: translate var(--speed) var(--easing);
+	translate: 0 calc(var(--dark, 0) * (100% - (3 / 8 * var(--width))));
+}
+
+[aria-pressed="false"] .toggle__backdrop:last-of-type {
+	transition-timing-function: cubic-bezier(0.2, -0.6, 0.7, 1.6);
+}
+[aria-pressed="false"] .stars path {
+	transition-delay: 0s;
+}
+
+.stars path {
+	transform-box: fill-box;
+	transform-origin: 25% 50%;
+	scale: calc(0.25 + (var(--dark, 0) * 0.75));
+	transition: scale var(--speed) calc(var(--speed) * 0.5) var(--easing);
+}
+
+.toggle__indicator {
+	height: 100%;
+	aspect-ratio: 1;
+	border-radius: 0%;
+	display: grid;
+	place-items: center;
+	padding: 3%;
+	transition: translate var(--speed) var(--slide-ease);
+	translate: calc(var(--dark, 0) * (100cqi - 100%)) 0;
+}
+
+.pilot-bear {
+	position: absolute;
+	width: 25%;
+}
+
+.toggle__star {
+	height: 100%;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	position: relative;
+	transition: translate var(--speed) var(--easing);
+	translate: calc((var(--dark, 0) * -10%) + 5%) 0;
+}
+
+.sun {
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	overflow: hidden;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+	background-image: url("data:image/svg+xml,%3Csvg width='123' height='123' viewBox='0 0 123 123' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M61.44 0C95.37 0 122.88 27.51 122.88 61.44C122.88 95.37 95.37 122.88 61.44 122.88C27.51 122.88 0 95.37 0 61.44C0 27.51 27.51 0 61.44 0Z' fill='%232394E0'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M11.7598 93.1799C8.13984 87.6899 5.42984 81.5399 3.83984 74.9499L14.6598 80.1699L14.7198 83.3999C14.7198 84.5899 12.6998 87.1099 12.0498 88.0699L11.7598 93.1799ZM78.3098 6.49994C98.9298 13.3499 114.4 31.4999 117.38 53.5999L115.43 53.3899C115.08 54.8899 114.76 54.9199 114.76 56.7199C114.76 58.3099 116.76 59.3699 116.76 62.7199C116.76 63.6199 114.65 65.4099 114.56 65.7299L111.43 62.0599V66.7299L110.96 66.7099L110.12 58.0899L108.37 58.6399L106.29 52.2299L99.4398 59.3899L99.3598 64.6299L97.1199 66.1299L94.7398 52.6899L93.3198 53.7299L90.0998 49.3799L85.2898 49.5199L83.4498 47.4099L81.5598 47.9299L77.8498 43.6799L77.1298 44.1699L79.4298 50.0499H82.0998V48.7199H83.4298C84.3898 51.3799 85.4298 49.7999 85.4298 51.3899C85.4298 56.9399 78.5798 61.0199 74.0898 62.0599C74.3298 63.0599 74.2398 64.0599 75.4198 64.0599C77.9298 64.0599 76.6798 63.6199 79.4198 63.3899C79.2898 69.0599 72.9198 75.8299 70.1998 80.0399L71.4198 88.7299C71.7398 90.6199 67.4998 92.6099 66.0598 94.7399L66.7498 98.0699L64.7998 98.8599C64.4598 102.28 61.1398 106.07 57.4098 106.07H53.4098C53.4098 101.39 50.0698 94.6999 50.0698 91.3899C50.0698 88.5799 51.3998 88.1999 51.3998 84.7199C51.3998 81.4999 48.0698 76.8899 48.0698 76.0499V70.7099H45.3998C44.9998 69.2199 45.2498 68.7099 43.3998 68.7099H42.7298C39.8198 68.7099 40.3098 70.0399 37.3898 70.0399H34.7198C32.3098 70.0399 28.0498 62.3199 28.0498 61.3699V53.3699C28.0498 49.9199 31.2098 46.1599 33.3898 44.6999V41.3699L36.3898 38.3199L38.0598 38.0399C41.6398 38.0399 41.2098 36.0399 43.3998 36.0399H49.3998V40.7099L55.9998 43.5299L56.6198 40.6799C59.6098 41.3799 60.3898 42.7099 64.0698 42.7099H65.3998C67.9298 42.7099 68.0698 39.3499 68.0698 36.7099L62.7298 37.2399L60.3998 32.1799L58.0898 32.7899C58.5098 34.5999 58.7298 33.8499 58.7298 35.3799C58.7298 36.2799 57.9898 36.3799 57.3898 36.7099L55.0798 30.8499L50.1098 27.2999L49.4498 27.9499L53.6798 32.3999C53.1198 33.9999 53.0498 38.6099 50.7198 35.3799L52.8998 34.3299L47.4598 28.6299L44.1998 29.8999L40.9798 32.9799C40.6398 35.4599 39.9698 36.7099 37.3698 36.7099C35.6398 36.7099 36.6798 36.2599 34.0298 36.0399V29.3699H40.0298L38.0798 24.9299L37.3598 25.3699V24.0299L47.1098 19.5399C46.9298 18.1399 46.6998 18.8899 46.6998 17.3599C46.6998 17.2699 47.3498 16.0399 47.3698 16.0199L49.8898 17.5899L49.2898 14.7199L45.3998 15.5199L44.6798 12.0299C47.7598 10.4099 54.5498 4.68994 56.7098 4.68994H58.7098C60.8198 4.68994 66.4598 6.76994 67.3798 8.01994L62.0298 7.47994L65.9998 10.7499L66.3798 9.34994L69.3398 8.53994L69.3798 6.68994H70.7198V8.68994L78.3098 6.49994Z' fill='%23A1E367'/%3E%3C/svg%3E");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.moon {
+	position: absolute;
+	inset: -1%;
+	border-radius: 50%;
+	background: var(--moon);
+	transition: translate var(--speed) ease-in-out;
+	translate: calc((100 - (var(--dark, 0) * 100)) * 1%) 0%;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.moon__crater {
+	position: absolute;
+	background: var(--crater);
+	border-radius: 50%;
+	width: calc(var(--size, 10) * 1%);
+	aspect-ratio: 1;
+	left: calc(var(--x) * 1%);
+	top: calc(var(--y) * 1%);
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.moon__crater:nth-of-type(1) {
+	--size: 18;
+	--x: 40;
+	--y: 15;
+}
+.moon__crater:nth-of-type(2) {
+	--size: 20;
+	--x: 65;
+	--y: 58;
+}
+.moon__crater:nth-of-type(3) {
+	--size: 34;
+	--x: 18;
+	--y: 40;
+}
+
+.toggle__star:before {
+	content: "";
+	z-index: -1;
+	width: 356%;
+	background: radial-gradient(hsl(0 0% 100% / 0.25) 40%, transparent 40.5%),
+		radial-gradient(hsl(0 0% 100% / 0.25) 56%, transparent 56.5%)
+		hsl(0 0% 100% / 0.25);
+	border-radius: 50%;
+	aspect-ratio: 1;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transition: translate var(--speed) var(--easing);
+	translate: calc((50 - (var(--dark, 0) * 4)) * -1%) -50%;
+}
+
+.toggle__star:after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	display: block;
+	background: hsl(0 0% 0% / 0.5);
+	filter: blur(4px);
+	translate: 2% 4%;
+	border-radius: 50%;
+	z-index: -1;
+}
+
+.toggle__indicator-wrapper {
+	position: absolute;
+	inset: 0;
+}
+
+[aria-pressed="true"] {
+	--dark: 1;
+}
+
+/* Fun stuff! */
+
+/* We have 11 stars */
+
+.stars g {
+	transform-box: fill-box;
+	transform-origin: 50% 50%;
+}
+.stars g:nth-of-type(3) {
+	animation: twinkle 4s -2s infinite;
+}
+
+.stars g:nth-of-type(5) {
+	animation: twinkle 6s -2s infinite;
+}
+
+.stars g:nth-of-type(2) {
+	animation: twinkle 4s -1s infinite;
+}
+
+@keyframes twinkle {
+	0%,
+	40%,
+	60%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(0);
+	}
+}
+
+.astrobear {
+	width: 12%;
+	position: absolute;
+	top: 100%;
+	left: 0%;
+	transition: translate
+		calc(var(--speed) + (var(--dark, 0) * (var(--bear-speed) - var(--speed))))
+		calc(var(--bear-speed) * (0.4 * var(--dark, 0))) linear;
+	translate: calc(var(--dark, 0) * 400%) calc(var(--dark, 0) * -350%);
+}
+
+.astrobear svg {
+	transform-origin: 50% 75%;
+	scale: var(--dark, 0);
+	rotate: calc(var(--dark, 0) * 360deg);
+	transition: rotate
+		calc(var(--speed) + (var(--dark, 0) * (var(--bear-speed) - var(--speed))))
+		calc(var(--bear-speed) * 0.4) linear, scale var(--speed) ease-in-out;
+}
+
+.astrobear__container {
+	position: absolute;
+	overflow: hidden;
+	inset: 0;
+	clip-path: inset(0 0 0 0);
+	opacity: var(--dark, 0);
+	translate: 0 calc(-200% + (var(--dark, 0) * 200%));
+	transition: opacity var(--speed) var(--easing), translate var(--speed)
+		var(--easing);
+}
+
+.pilot__container {
+	position: absolute;
+	overflow: hidden;
+	inset: 0;
+	clip-path: inset(0 0 0 0);
+	opacity: calc(1 - var(--dark, 0));
+	translate: 0 calc(var(--dark, 0) * 200%);
+	transition: opacity var(--speed) var(--easing), translate var(--speed)
+		var(--easing);
+}
+
+.pilot-bear {
+	width: 18%;
+	position: absolute;
+	top: 70%;
+	left: 100%;
+	transition: translate
+		calc(
+			var(--speed) +
+			((1 - var(--dark, 0)) * ((var(--bear-speed) * 0.5) - var(--speed)))
+		)
+		calc((var(--bear-speed) * 0.5) * ((1 - var(--dark, 0)) * 0.4)) linear;
+	translate: calc((0 - (1 - var(--dark, 0))) * (var(--width) + 100%))
+		calc((0 - (1 - var(--dark, 0))) * (200%));
+}
+
+.pilot {
+	rotate: 12deg;
+	animation: fly 4s infinite ease-in-out;
+}
+
+@keyframes fly {
+	50% {
+		translate: 0 -25%;
+	}
+}
+
+.controls {
+	position: fixed;
+	bottom: 1rem;
+	right: 1rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-family: sans-serif;
+	color: var(--color);
+	transition: color var(--speed) var(--easing);
+}
+
+[type="checkbox"] {
+	accent-color: var(--color);
+	transition: accent-color var(--speed) var(--easing);
+}
+
+.bear-link {
+	color: canvasText;
+	position: fixed;
+	top: 1rem;
+	left: 1rem;
+	width: 48px;
+	aspect-ratio: 1;
+	display: grid;
+	place-items: center;
+	opacity: 0.8;
+	transition: color var(--speed);
+}
+
+:where(.x-link, .bear-link):is(:hover, :focus-visible) {
+	opacity: 1;
+}
+.bear-link svg {
+	width: 75%;
+}
