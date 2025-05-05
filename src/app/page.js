@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroSection from "@/components/home/HeroSection";
 import StraightSection from "@/components/home/NextSection";
 import { Button3 } from "@/components/UI/SpinDielButton";
+import ClientsTestimonialsSection from "@/components/home/ClientsTestimonialsSection";
 
 // Register GSAP plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -249,6 +250,7 @@ export default function Home() {
 			{/* Parallax section slides up from beneath, overlapping HeroSection at the start */}
 			<div className="relative z-10 -mt-32">{renderParallaxSection()}</div>
 			<StraightSection />
+			<ClientsTestimonialsSection />
 		</div>
 	);
 }

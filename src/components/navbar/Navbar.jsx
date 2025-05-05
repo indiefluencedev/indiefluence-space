@@ -5,14 +5,13 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import DarkModeToggle from "./toggle/DarkModeToggle";
 
-
-
-
 const navLinks = [
-	{ id: "01", label: "Services", href: "/services" },
-	{ id: "02", label: "Projects", href: "/projects" },
-	{ id: "03", label: "Expertise", href: "/expertise" },
-	{ id: "04", label: "Contact", href: "/contact" },
+	{ id: "01", label: "Home", href: "/" },
+	{ id: "02", label: "About", href: "/about" },
+	{ id: "03", label: "Services", href: "/services" },
+	{ id: "04", label: "Projects", href: "/projects" },
+	{ id: "05", label: "Expertise", href: "/expertise" },
+	{ id: "06", label: "Contact", href: "/contact" },
 ];
 
 const Navbar = () => {
