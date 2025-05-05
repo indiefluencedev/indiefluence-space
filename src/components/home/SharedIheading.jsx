@@ -321,7 +321,7 @@ const SharedHeading = () => {
 			</div>
 
 			{/* Tagline and button */}
-			<div className="ml-auto text-right max-w-full xs:max-w-[90%] sm:max-w-[85%] md:max-w-[80%] lg:max-w-[75%] xl:max-w-[70%]">
+			<div className="ml-30 text-right max-w-full xs:max-w-[90%] sm:max-w-[85%] md:max-w-[80%] lg:max-w-[75%] xl:max-w-[70%]">
 				<p className="text-xs xss:text-sm xs:text-base sm:text-[1.05rem] md:text-lg mb-3 xs:mb-4 sm:mb-5 md:mb-6">
 					We are a bunch of{" "}
 					<span className="font-bold text-[var(--primary-color)] text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl">
