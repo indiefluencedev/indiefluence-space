@@ -1,17 +1,19 @@
 import "./globals.css";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Manrope, Orbitron } from "next/font/google";
 import { ThemeProvider } from "@/context/TheamContext";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
 import BackgroundEffects from "@/components/UI/BackgroundEffect";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
+const manrope = Manrope({
+	variable: "--font-manrope",
 	subsets: ["latin"],
 });
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
+
+const orbitron = Orbitron({
+	variable: "--font-Orbitron",
 	subsets: ["latin"],
+	weight: "400", // Share Tech only comes in 400 weight
 });
 
 export const metadata = {
@@ -21,8 +23,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 	return (
-		<html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-			<body className="antialiased min-h-screen relative">
+		<html lang="en" className={`${manrope.variable} ${orbitron.variable}`}>
+			<body
+				className="antialiased min-h-screen relative"
+				suppressHydrationWarning={true}
+			>
 				<ThemeProvider>
 					{/* Background Effects added here */}
 					<BackgroundEffects />
