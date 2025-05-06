@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroSection from "@/components/home/HeroSection";
-import StraightSection from "@/components/home/NextSection";
+import StraightSection from "@/components/home/ServiceSection";
 import { Button3 } from "@/components/UI/SpinDielButton";
 import ClientsTestimonialsSection from "@/components/home/ClientsTestimonialsSection";
 
