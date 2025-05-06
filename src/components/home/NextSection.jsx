@@ -101,7 +101,7 @@ export default function ServicesSection() {
 		// Animate the cards container to move horizontally
 		horizontalScroll.to(cardsContainer, {
 			x: () => -(cardsContainer.scrollWidth - window.innerWidth),
-			ease: "none",
+			ease: "sine.inOut",
 		});
 
 		// Set up individual section animations

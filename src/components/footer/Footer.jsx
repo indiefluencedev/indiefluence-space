@@ -1,13 +1,13 @@
 "use client";
 import React from "react";
-// BackgroundBeams component included directly in this file
-// Add cn utility function if you don't have it in your project
+import { motion } from "framer-motion";
+
+// Utility function for combining class names
 const cn = (...classes) => {
 	return classes.filter(Boolean).join(" ");
 };
-import { motion } from "framer-motion";
 
-// BackgroundBeams component from your code
+// BackgroundBeams component with all paths
 const BackgroundBeams = React.memo(({ className }) => {
 	const paths = [
 		"M-380 -189C-380 -189 -312 216 152 343C616 470 684 875 684 875",
@@ -149,134 +149,197 @@ const Footer = () => {
 		<footer className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
 			{/* Background Effect */}
 			<BackgroundBeams className="opacity-70" />
-			Content Container
-			<div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-				{/* Main Heading */}
-				<motion.h1
-					className="text-5xl md:text-7xl lg:text-9xl font-bold text-white mb-12 tracking-tighter"
-					initial={{ opacity: 0, y: 20 }}
+
+			{/* Content Container */}
+			<div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-8">
+				{/* Top Section - TagLine */}
+				<div className="mb-8">
+					<motion.p
+						className="text-sm text-white/70"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.6 }}
+					>
+						Uncover the potency of SquadHub.ai
+					</motion.p>
+				</div>
+
+				{/* Middle Section - Email and Phone */}
+				<motion.div
+					className="mb-16"
+					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.8 }}
+					transition={{ duration: 0.8, delay: 0.2 }}
 				>
-					LET'S CONNECT
-				</motion.h1>
+					<h2 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white border-b border-white/20 pb-2">
+						venu@indiefluence.in
+					</h2>
+				</motion.div>
 
-				{/* Contact Links */}
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-3xl mb-16">
-					<ContactItem
-						icon="✉️"
-						title="Email"
-						link="mailto:hello@example.com"
-						text="hello@example.com"
-					/>
-					<ContactItem
-						icon="📱"
-						title="Phone"
-						link="tel:+1234567890"
-						text="+123 456 7890"
-					/>
-					<ContactItem
-						icon="📍"
-						title="Location"
-						link="#"
-						text="New York, USA"
-					/>
-				</div>
+				{/* Phone Number Section */}
+				{/* <motion.div
+					className="mb-16"
+					initial={{ opacity: 0, y: 10 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.8, delay: 0.3 }}
+				>
+					<h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white border-b border-white/20 pb-2">
+						+91 98765 43210
+					</h2>
+				</motion.div> */}
 
-				{/* Social Links */}
-				<div className="flex space-x-6 mb-16">
-					<SocialIcon name="Twitter" />
-					<SocialIcon name="Instagram" />
-					<SocialIcon name="LinkedIn" />
-					<SocialIcon name="GitHub" />
-				</div>
-
-				{/* Bottom Section */}
-				<div className="w-full border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
-					<nav>
-						<ul className="flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4 mb-8 md:mb-0">
+				{/* Bottom Section - Links and Info */}
+				<div className="flex flex-col md:flex-row justify-between">
+					{/* Left Links */}
+					<motion.div
+						className="mb-8 md:mb-0"
+						initial={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.8, delay: 0.4 }}
+					>
+						<ul className="space-y-2">
 							<li>
 								<a
 									href="#"
-									className="text-white/70 hover:text-white transition-colors"
+									className="text-white hover:text-white/80 transition-colors text-lg"
 								>
-									Home
+									Products
 								</a>
 							</li>
 							<li>
 								<a
 									href="#"
-									className="text-white/70 hover:text-white transition-colors"
+									className="text-white hover:text-white/80 transition-colors text-lg"
 								>
-									About
+									Pricing
 								</a>
 							</li>
 							<li>
 								<a
 									href="#"
-									className="text-white/70 hover:text-white transition-colors"
+									className="text-white hover:text-white/80 transition-colors text-lg"
 								>
-									Services
-								</a>
-							</li>
-							<li>
-								<a
-									href="#"
-									className="text-white/70 hover:text-white transition-colors"
-								>
-									Portfolio
-								</a>
-							</li>
-							<li>
-								<a
-									href="#"
-									className="text-white/70 hover:text-white transition-colors"
-								>
-									Contact
+									Contact Us
 								</a>
 							</li>
 						</ul>
-					</nav>
-					<p className="text-white/50 text-sm">
-						© {new Date().getFullYear()} Your Company. All rights reserved.
-					</p>
+					</motion.div>
+
+					{/* Right Address */}
+					<motion.div
+						className="text-right"
+						initial={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.8, delay: 0.6 }}
+					>
+						<h3 className="text-white text-lg mb-2">Office</h3>
+						<address className="text-white/70 not-italic">
+							Plot 151,
+							<br />
+							Sector-2 Industrial Area,
+							<br />
+							Kurukshetra, Haryana, 136118
+						</address>
+					</motion.div>
 				</div>
+
+				{/* CTA Button - Changed to sharp edges */}
+				<motion.div
+					className="absolute top-0 right-8"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ duration: 0.8, delay: 1 }}
+				>
+					<div className=" bg-white rounded-sm p-2 w-40 h-28">
+						<p className="text-[var(--secondary-color)] font-bold text-2xl mb-1">
+							Get Started
+						</p>
+						<div className="flex justify-between items-center bg-[var(--primary-color)]  p-2 mt-4">
+							<span className="text-black  text-lg">Go</span>
+							<div className=" bg-black w-6 h-6 flex items-center justify-center">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-4 w-4 text-white"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M14 5l7 7m0 0l-7 7m7-7H3"
+									/>
+								</svg>
+							</div>
+						</div>
+					</div>
+				</motion.div>
 			</div>
+
+			{/* LET'S CONECT Section - Moved outside container for full width */}
+			<motion.div
+				className="w-full relative mt-16"
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ duration: 1, delay: 0.8 }}
+			>
+				<h1 className="text-[4rem] md:text-[8rem] lg:text-[12rem] font-bold ml-7 text-white text-left">
+					LET'S CONECT{" "}
+					<svg
+						width="120"
+						height="120"
+						viewBox="0 0 80 80"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						className="text-white"
+					>
+						<path
+							d="M16 64L64 16"
+							stroke="currentColor"
+							strokeWidth="4"
+							strokeLinecap="square"
+						/>
+						<path
+							d="M24 16H64V56"
+							stroke="currentColor"
+							strokeWidth="4"
+							strokeLinecap="square"
+						/>
+					</svg>
+				</h1>
+				{/* Bigger Diagonal Arrow */}
+				{/* <motion.div
+					className="absolute right-6 md:right-16 lg:right-24 xl:right-32 top-8 lg:top-8"
+					initial={{ opacity: 0, x: -20, y: 20 }}
+					animate={{ opacity: 1, x: 0, y: 0 }}
+					transition={{ duration: 0.8, delay: 1.2 }}
+				>
+					<svg
+						width="120"
+						height="120"
+						viewBox="0 0 80 80"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						className="text-white"
+					>
+						<path
+							d="M16 64L64 16"
+							stroke="currentColor"
+							strokeWidth="4"
+							strokeLinecap="square"
+						/>
+						<path
+							d="M24 16H64V56"
+							stroke="currentColor"
+							strokeWidth="4"
+							strokeLinecap="square"
+						/>
+					</svg>
+				</motion.div> */}
+			</motion.div>
 		</footer>
 	);
 };
-
-// Contact Item Component
-const ContactItem = ({ icon, title, link, text }) => (
-	<motion.a
-		href={link}
-		className="flex flex-col items-center text-center p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all group"
-		whileHover={{ scale: 1.05 }}
-		transition={{ type: "spring", stiffness: 400, damping: 10 }}
-	>
-		<span className="text-3xl mb-3">{icon}</span>
-		<h3 className="text-xl font-medium text-white mb-2">{title}</h3>
-		<p className="text-white/70 group-hover:text-white transition-colors">
-			{text}
-		</p>
-	</motion.a>
-);
-
-// Social Icon Component
-const SocialIcon = ({ name }) => (
-	<motion.a
-		href="#"
-		className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 text-white hover:bg-white/20 transition-colors"
-		whileHover={{ scale: 1.15 }}
-		transition={{ type: "spring", stiffness: 400, damping: 10 }}
-		aria-label={name}
-	>
-		{/* You can replace these with actual icons */}
-		{name === "Twitter" && "𝕏"}
-		{name === "Instagram" && "IG"}
-		{name === "LinkedIn" && "in"}
-		{name === "GitHub" && "GH"}
-	</motion.a>
-);
 
 export default Footer;
