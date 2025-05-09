@@ -3,18 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
-import {
-	CosmicPulseButton,
-	OrbitalButton,
-	NebulaButton,
-	WarpDriveButton,
-	GravityWellButton,
-	ConstellationButton,
-	QuantumButton,
-	WormholeButton,
-	SolarFlareButton,
-	BlackHoleButton,
-} from "../UI/SpinDielButton";
+import { QuantumButton } from "../UI/SpinDielButton";
 gsap.registerPlugin(TextPlugin);
 
 // Hoverable Letter component for interactive text - now respects theme
@@ -338,17 +327,21 @@ const SharedHeading = () => {
 					</span>
 				</p>
 
-				<CosmicPulseButton />
-				<OrbitalButton />
-				<NebulaButton />
-				<WarpDriveButton />
-				<GravityWellButton />
-				<ConstellationButton />
+				<div className="justify-end flex items-center">
+					<QuantumButton
+						text="EXPLORE"
+						className="mt-4 xs:mt-5 sm:mt-6 md:mt-4 "
+						onClick={() => router.push("/explore")}
+					/>
+				</div>
+				{/* <ButtonControls /> */}
+				{/* <CosmicPulseButton /> */}
+				{/* <WarpDriveButton /> */}
+				{/* <ConstellationButton /> */}
+				{/* <QuantumButton /> */}
+				{/* <WormholeButton /> */}
+				{/* <QuantumButton  /> */}
 				{/* <MeteorButton /> */}
-				<QuantumButton />
-				<WormholeButton />
-				<SolarFlareButton />
-				<BlackHoleButton />
 
 				{/* Button with hover effect */}
 			</div>
