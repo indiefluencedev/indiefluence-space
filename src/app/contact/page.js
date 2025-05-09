@@ -1,191 +1,96 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useTheme } from '@/context/TheamContext'
+import React from 'react';
+import LogoAnimation from '@/components/reusablesection/LogoAnimation';
+import { useTheme } from '@/context/TheamContext';
+import {
+	MdPerson,
+	MdPhone,
+	MdEmail,
+	MdSubject,
+	MdOutlineContactMail,
+} from 'react-icons/md';
 
-export default function Contact() {
-  const { darkMode } = useTheme()
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  })
+export default function ContactPage() {
+	const { darkMode } = useTheme();
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // Handle form submission here
-    console.log('Form submitted:', formData)
-  }
+	// Shared styles
+	const wrapperClass = `flex items-center gap-3 border rounded-xl px-4 py-5 ${
+		darkMode ? 'border-gray-600' : 'border-gray-500'
+	}`;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
+	const inputClass = `w-full outline-none ${
+		darkMode
+			? 'bg-transparent text-white placeholder-gray-400'
+			: 'bg-transparent text-black placeholder-gray-800'
+	}`;
 
-  return (
-    <div className={`min-h-screen py-20 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h1 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Contact Us
-          </h1>
-          <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-            Get in touch with our team
-          </p>
-        </div>
+	return (
+		<div className="relative flex items-center min-h-screen overflow-hidden transition-colors duration-300">
+			{/* Logo Animation */}
+			<div className="absolute left-[-7%] top-1/2 transform -translate-y-1/3 z-0 w-[600px] h-[600px] opacity-20 xl:opacity-30">
+				<LogoAnimation />
+			</div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <div className={`p-8 rounded-lg ${
-            darkMode ? 'bg-gray-800' : 'bg-gray-50'
-          }`}>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label
-                  htmlFor="name"
-                  className={`block text-sm font-medium mb-2 ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-                >
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 rounded-md border ${
-                    darkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  }`}
-                  required
-                />
-              </div>
+			{/* Content */}
+			<div className="relative z-10 w-full max-w-2xl mx-auto px-4 text-center pb-20 pt-36 xl:pt-20">
+				<h2
+					className={`text-4xl sm:text-6xl tracking-wide font-bold mb-6 leading-snug ${
+						darkMode ? 'text-white' : 'text-black'
+					}`}
+				>
+					Got <span className="text-[#FFD000]">(Koi Shaq)</span> QUESTIONS?
+				</h2>
 
-              <div>
-                <label
-                  htmlFor="email"
-                  className={`block text-sm font-medium mb-2 ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 rounded-md border ${
-                    darkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  }`}
-                  required
-                />
-              </div>
+				<p className={`mb-10 ${darkMode ? 'text-gray-400' : 'text-gray-700'}`}>
+					Whether you have a project in mind, want to collaborate, or just have a question,
+					feel free to reach out. Our team is ready to help.
+				</p>
 
-              <div>
-                <label
-                  htmlFor="message"
-                  className={`block text-sm font-medium mb-2 ${
-                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-                >
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  rows={4}
-                  className={`w-full px-4 py-2 rounded-md border ${
-                    darkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  }`}
-                  required
-                />
-              </div>
+				<form className="space-y-5 text-left">
+					{/* Name */}
+					<div className={wrapperClass}>
+						<MdPerson size={24} className="text-gray-500" />
+						<input type="text" placeholder="Name" className={inputClass} />
+					</div>
 
-              <button
-                type="submit"
-                className={`w-full py-3 px-4 rounded-md font-medium ${
-                  darkMode
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-blue-500 hover:bg-blue-600 text-white'
-                }`}
-              >
-                Send Message
-              </button>
-            </form>
-          </div>
+					{/* Phone */}
+					<div className={wrapperClass}>
+						<MdPhone size={24} className="text-gray-500" />
+						<input type="tel" placeholder="Phone" className={inputClass} />
+					</div>
 
-          {/* Contact Information */}
-          <div className={`p-8 rounded-lg ${
-            darkMode ? 'bg-gray-800' : 'bg-gray-50'
-          }`}>
-            <h2 className={`text-2xl font-semibold mb-6 ${
-              darkMode ? 'text-white' : 'text-gray-900'
-            }`}>
-              Get in Touch
-            </h2>
+					{/* Email */}
+					<div className={wrapperClass}>
+						<MdEmail size={24} className="text-gray-500" />
+						<input type="email" placeholder="Email Address" className={inputClass} />
+					</div>
 
-            <div className="space-y-6">
-              <div>
-                <h3 className={`text-lg font-medium mb-2 ${
-                  darkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Email
-                </h3>
-                <a
-                  href="mailto:contact@wbsft.com"
-                  className={`text-blue-500 hover:text-blue-600 ${
-                    darkMode ? 'text-blue-400 hover:text-blue-300' : ''
-                  }`}
-                >
-                  contact@wbsft.com
-                </a>
-              </div>
+					{/* Subject */}
+					<div className={wrapperClass}>
+						<MdSubject size={24} className="text-gray-500" />
+						<input type="text" placeholder="Subject" className={inputClass} />
+					</div>
 
-              <div>
-                <h3 className={`text-lg font-medium mb-2 ${
-                  darkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Phone
-                </h3>
-                <a
-                  href="tel:+15148743224"
-                  className={`text-blue-500 hover:text-blue-600 ${
-                    darkMode ? 'text-blue-400 hover:text-blue-300' : ''
-                  }`}
-                >
-                  (514) 874-3224
-                </a>
-              </div>
+					{/* Message */}
+					<div className={`${wrapperClass} items-start`}>
+						<MdOutlineContactMail size={24} className="text-gray-500 " />
+						<textarea
+							rows={4}
+							placeholder="How can we help you? Feel free to get in touch!"
+							className={`${inputClass}  resize-none`}
+						></textarea>
+					</div>
 
-              <div>
-                <h3 className={`text-lg font-medium mb-2 ${
-                  darkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Address
-                </h3>
-                <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  460 Saint-Catherine W. Suite 305<br />
-                  Montreal, Quebec H3B 1A6
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+					{/* Submit */}
+					<button
+						type="submit"
+						className="px-6 py-2 rounded-full bg-lime-400 text-black font-semibold hover:bg-lime-300 transition-all"
+					>
+						SEND →
+					</button>
+				</form>
+			</div>
+		</div>
+	);
 }
