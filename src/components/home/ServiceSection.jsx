@@ -1,8 +1,10 @@
-'use client';
+"use client";
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { CosmicPulseButton } from "../UI/SpinDielButton";
+import { useTheme } from "@/context/TheamContext";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -68,9 +70,11 @@ const services = [
 ];
 
 export default function ServicesSection() {
+	const { darkMode } = useTheme();
 	const sectionRef = useRef(null);
 	const cardsContainerRef = useRef(null);
 	const sectionsRef = useRef([]);
+	const progressRef = useRef([]);
 
 	useEffect(() => {
 		// Set up the horizontal scroll effect
@@ -97,6 +101,18 @@ export default function ServicesSection() {
 				scrub: 1,
 				anticipatePin: 1,
 				invalidateOnRefresh: true,
+				onUpdate: (self) => {
+					// Update progress indicators
+					const progress = Math.floor(self.progress * services.length);
+					progressRef.current.forEach((dot, i) => {
+						if (dot) {
+							dot.setAttribute(
+								"data-current",
+								i === progress ? "true" : "false",
+							);
+						}
+					});
+				},
 			},
 		});
 
@@ -108,6 +124,8 @@ export default function ServicesSection() {
 
 		// Set up individual section animations
 		sectionsRef.current.forEach((sectionEl, index) => {
+			if (!sectionEl) return;
+
 			gsap.fromTo(
 				sectionEl,
 				{
@@ -138,7 +156,7 @@ export default function ServicesSection() {
 	return (
 		<>
 			{/* Heading Section - 400px height */}
-			<section className="w-full h-[400px] flex flex-col justify-center items-center border-b border-gray-200 [data-dark-mode='true']:border-gray-800">
+			<section className="w-full h-[400px] flex flex-col justify-center items-center border-b border-gray-200 dark:border-gray-800">
 				<div className="w-full max-w-7xl mx-auto px-8">
 					<div className="flex justify-between items-center w-full">
 						<div className="flex items-center">
@@ -168,7 +186,7 @@ export default function ServicesSection() {
 						<div
 							key={service.id}
 							ref={(el) => (sectionsRef.current[index] = el)}
-							className="w-screen h-full flex items-center px-8 md:px-16 border-b border-gray-200 [data-dark-mode='true']:border-gray-800"
+							className="w-screen h-full flex items-center px-8 md:px-16 border-b border-gray-200 dark:border-gray-800"
 						>
 							<div className="w-full h-full flex flex-col md:flex-row items-center">
 								{/* Left side with content and number */}
@@ -187,34 +205,13 @@ export default function ServicesSection() {
 										{service.description}
 									</p>
 
-									<button className="mt-6 border border-black [data-dark-mode='true']:border-white text-black [data-dark-mode='true']:text-white px-8 py-3 hover:bg-black hover:text-white [data-dark-mode='true']:hover:bg-white [data-dark-mode='true']:hover:text-black transition-all w-fit flex items-center group">
-										<span>SEE OUR SERVICES</span>
-										<svg
-											className="ml-4 w-4 h-4 group-hover:translate-x-1 transition-transform"
-											viewBox="0 0 24 24"
-											fill="none"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												d="M13 5L20 12L13 19"
-												stroke="currentColor"
-												strokeWidth="2"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											/>
-											<path
-												d="M3 12H20"
-												stroke="currentColor"
-												strokeWidth="2"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											/>
-										</svg>
-									</button>
+
+
+									<CosmicPulseButton/>
 								</div>
 
 								{/* Right side with image */}
-								<div className="w-full md:w-1/2 h-3/4 bg-gray-100 [data-dark-mode='true']:bg-gray-800 flex items-center justify-center">
+								<div className="w-full md:w-1/2 h-3/4 bg-default flex items-center justify-center">
 									{service.id === "001" ? (
 										<div className="w-32 h-32">
 											<svg
@@ -239,12 +236,14 @@ export default function ServicesSection() {
 					))}
 				</div>
 
-				{/* Progress indicator (optional) */}
+				{/* Progress indicator */}
 				<div className="absolute bottom-8 left-0 w-full flex justify-center gap-2">
 					{services.map((service, index) => (
 						<div
 							key={index}
-							className="w-2 h-2 rounded-full bg-gray-400 opacity-30 [data-current='true']:opacity-100"
+							ref={(el) => (progressRef.current[index] = el)}
+							data-current={index === 0 ? "true" : "false"}
+							className="w-2 h-2 rounded-full bg-gray-400 opacity-30 data-[current='true']:opacity-100"
 						></div>
 					))}
 				</div>
@@ -252,6 +251,3 @@ export default function ServicesSection() {
 		</>
 	);
 }
-
-
-//priya changes

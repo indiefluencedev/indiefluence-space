@@ -304,7 +304,7 @@ export default function ClientsTestimonialsSection() {
 										</div>
 									</div>
 
-									<button className="mt-12 border border-black [data-dark-mode='true']:border-white text-black [data-dark-mode='true']:text-white px-8 py-3 hover:bg-black hover:text-white [data-dark-mode='true']:hover:bg-white [data-dark-mode='true']:hover:text-black transition-all w-fit flex items-center group">
+									<button className="mt-12 border-2 border-default  text-default px-8 py-3 hover:bg-black hover:text-default  transition-all w-fit flex items-center group">
 										<span>READ CASE STUDY</span>
 										<svg
 											className="ml-4 w-4 h-4 group-hover:translate-x-1 transition-transform"
