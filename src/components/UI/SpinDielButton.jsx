@@ -68,24 +68,84 @@ const SpinDialText = ({ text = "BUTTON", isHovering, duration = 0.5 }) => {
 	);
 };
 
-// Button 1: CosmicPulseButton - Your original button with text animation
+// Button Controls Component
+export const ButtonControls = ({ onSizeChange }) => {
+	const [width, setWidth] = useState(300);
+	const [height, setHeight] = useState(80);
+
+	const handleWidthChange = (e) => {
+		const newWidth = Math.max(300, parseInt(e.target.value) || 300);
+		setWidth(newWidth);
+		onSizeChange({ width: newWidth, height });
+	};
+
+	const handleHeightChange = (e) => {
+		const newHeight = Math.max(80, parseInt(e.target.value) || 80);
+		setHeight(newHeight);
+		onSizeChange({ width, height: newHeight });
+	};
+
+	return (
+		<div className="p-4 mb-6 bg-gray-100 dark:bg-gray-800 rounded-lg">
+			<h3 className="text-lg font-medium mb-4 dark:text-white">
+				Button Size Controls
+			</h3>
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div>
+					<label className="block text-sm font-medium mb-1 dark:text-gray-300">
+						Width (min 300px)
+					</label>
+					<input
+						type="number"
+						min="300"
+						value={width}
+						onChange={handleWidthChange}
+						className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+					/>
+				</div>
+				<div>
+					<label className="block text-sm font-medium mb-1 dark:text-gray-300">
+						Height (min 80px)
+					</label>
+					<input
+						type="number"
+						min="80"
+						value={height}
+						onChange={handleHeightChange}
+						className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+					/>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+// Base Button Styles
+const baseButtonStyles = {
+	minWidth: 300,
+	minHeight: 80,
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "center",
+	fontSize: "1.1rem",
+	fontWeight: "bold",
+	borderRadius: "8px",
+	cursor: "pointer",
+	transition: "all 0.3s ease",
+};
+
+// Button 1: CosmicPulseButton - EXPLORESPACE
 export const CosmicPulseButton = ({
-	text = "EXPLORE SPACE",
+	text = "EXPLORESPACE",
 	onClick,
 	className = "",
-	size = "md",
+	width = 300,
+	height = 80,
 }) => {
 	const { darkMode } = useTheme();
 	const [isHovering, setIsHovering] = useState(false);
 	const buttonRef = useRef(null);
 	const pulseRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-3 py-1.5 text-xs",
-		md: "px-5 py-2.5 text-sm",
-		lg: "px-6 py-3 text-base",
-	};
 
 	// Theme-aware colors
 	const bgColor = darkMode ? "var(--secondary-color)" : "var(--primary-color)";
@@ -138,8 +198,15 @@ export const CosmicPulseButton = ({
 
 	return (
 		<button
-			style={{ backgroundColor: bgColor, color: textColor }}
-			className={`font-medium relative rounded-md ${sizeClasses[size]} ${className}`}
+			ref={buttonRef}
+			style={{
+				...baseButtonStyles,
+				backgroundColor: bgColor,
+				color: textColor,
+				width: `${width}px`,
+				height: `${height}px`,
+			}}
+			className={`relative ${className}`}
 			onMouseEnter={() => setIsHovering(true)}
 			onMouseLeave={() => setIsHovering(false)}
 			onClick={onClick}
@@ -152,13 +219,10 @@ export const CosmicPulseButton = ({
 			/>
 
 			{/* Button content */}
-			<div
-				ref={buttonRef}
-				className="flex items-center justify-center relative z-10"
-			>
+			<div className="flex items-center justify-center relative z-10">
 				<SpinDialText text={text} isHovering={isHovering} duration={0.4} />
 				<svg
-					className="w-3 h-3 sm:w-4 sm:h-4 ml-2"
+					className="w-4 h-4 ml-3"
 					viewBox="0 0 24 24"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
@@ -176,265 +240,19 @@ export const CosmicPulseButton = ({
 	);
 };
 
-// Button 2: OrbitalButton - Orbit path animation
-export const OrbitalButton = ({
-	text = "LAUNCH MISSION",
-	onClick,
-	className = "",
-	size = "md",
-}) => {
-	const { darkMode } = useTheme();
-	const [isHovering, setIsHovering] = useState(false);
-	const buttonRef = useRef(null);
-	const orbitRef = useRef(null);
-	const planetRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-3 py-1.5 text-xs",
-		md: "px-5 py-2.5 text-sm",
-		lg: "px-6 py-3 text-base",
-	};
-
-	// Theme-aware colors
-	const bgColor = darkMode ? "#111827" : "white";
-	const textColor = darkMode
-		? "var(--primary-color)"
-		: "var(--secondary-color)";
-	const borderColor = darkMode
-		? "var(--primary-color)"
-		: "var(--secondary-color)";
-	const planetColor = darkMode
-		? "var(--primary-color)"
-		: "var(--secondary-color)";
-
-	useEffect(() => {
-		if (!buttonRef.current || !orbitRef.current || !planetRef.current) return;
-
-		if (isHovering) {
-			// Orbit animation
-			gsap.to(planetRef.current, {
-				rotation: 360,
-				duration: 2,
-				ease: "linear",
-				repeat: -1,
-				transformOrigin: "center center",
-			});
-
-			// Button scaling
-			gsap.to(buttonRef.current, {
-				scale: 1.05,
-				duration: 0.4,
-				ease: "back.out(1.7)",
-			});
-
-			// Show orbit
-			gsap.to(orbitRef.current, {
-				opacity: 1,
-				duration: 0.3,
-			});
-		} else {
-			// Stop orbit animation
-			gsap.killTweensOf(planetRef.current);
-
-			// Reset button
-			gsap.to(buttonRef.current, {
-				scale: 1,
-				duration: 0.4,
-			});
-
-			// Hide orbit
-			gsap.to(orbitRef.current, {
-				opacity: 0,
-				duration: 0.3,
-			});
-		}
-	}, [isHovering]);
-
-	return (
-		<button
-			ref={buttonRef}
-			style={{
-				backgroundColor: bgColor,
-				color: textColor,
-				borderColor: borderColor,
-			}}
-			className={`border-2 font-medium relative rounded-md overflow-hidden ${sizeClasses[size]} ${className}`}
-			onMouseEnter={() => setIsHovering(true)}
-			onMouseLeave={() => setIsHovering(false)}
-			onClick={onClick}
-		>
-			{/* Orbital path */}
-			<div
-				ref={orbitRef}
-				className="absolute inset-0 pointer-events-none opacity-0"
-			>
-				<div
-					className="absolute w-full h-full rounded-full border-dashed"
-					style={{
-						borderColor: darkMode ? "#fbcc0380" : "#39529980",
-						borderWidth: "1px",
-						transform: "scale(1.5)",
-					}}
-				/>
-
-				{/* Orbiting planet */}
-				<div
-					ref={planetRef}
-					className="absolute w-3 h-3 rounded-full"
-					style={{
-						backgroundColor: planetColor,
-						top: "15%",
-						left: "80%",
-						boxShadow: `0 0 10px ${planetColor}`,
-					}}
-				/>
-			</div>
-
-			{/* Button content */}
-			<div className="flex items-center justify-center relative z-10">
-				<span>{text}</span>
-				<svg
-					className="w-3 h-3 sm:w-4 sm:h-4 ml-2"
-					viewBox="0 0 24 24"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path
-						d="M12 5L19 12M19 12L12 19M19 12H5"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					/>
-				</svg>
-			</div>
-		</button>
-	);
-};
-
-// Button 3: NebulaButton - Glowing border effect
-export const NebulaButton = ({
-	text = "DISCOVER",
-	onClick,
-	className = "",
-	size = "md",
-}) => {
-	const { darkMode } = useTheme();
-	const [isHovering, setIsHovering] = useState(false);
-	const buttonRef = useRef(null);
-	const glowRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-3 py-1.5 text-xs",
-		md: "px-5 py-2.5 text-sm",
-		lg: "px-6 py-3 text-base",
-	};
-
-	// Theme-aware colors
-	const bgColor = darkMode ? "#111827" : "white";
-	const textColor = darkMode ? "white" : "var(--secondary-color)";
-	const glowColor1 = "var(--primary-color)";
-	const glowColor2 = "var(--secondary-color)";
-
-	useEffect(() => {
-		if (!buttonRef.current || !glowRef.current) return;
-
-		if (isHovering) {
-			// Glow animation
-			gsap.fromTo(
-				glowRef.current,
-				{
-					backgroundImage: `linear-gradient(90deg, ${glowColor1}, ${glowColor2}, ${glowColor1})`,
-					backgroundSize: "200% 100%",
-					backgroundPosition: "0% 0%",
-				},
-				{
-					backgroundPosition: "200% 0%",
-					duration: 2,
-					ease: "none",
-					repeat: -1,
-				},
-			);
-
-			// Button transformation
-			gsap.to(buttonRef.current, {
-				boxShadow: `0 0 15px ${darkMode ? "rgba(251, 204, 3, 0.5)" : "rgba(57, 82, 153, 0.5)"}`,
-				scale: 1.03,
-				duration: 0.4,
-			});
-		} else {
-			// Stop animations
-			gsap.killTweensOf(glowRef.current);
-
-			// Reset button
-			gsap.to(buttonRef.current, {
-				boxShadow: "none",
-				scale: 1,
-				duration: 0.4,
-			});
-		}
-	}, [isHovering, darkMode]);
-
-	return (
-		<div className="relative">
-			{/* Glow border */}
-			<div
-				ref={glowRef}
-				className="absolute inset-0 rounded-md opacity-0"
-				style={{ opacity: isHovering ? 0.8 : 0, padding: "2px" }}
-			>
-				<div
-					style={{ backgroundColor: bgColor }}
-					className="w-full h-full rounded-md"
-				/>
-			</div>
-
-			{/* Button */}
-			<button
-				ref={buttonRef}
-				style={{
-					backgroundColor: bgColor,
-					color: textColor,
-					borderColor: isHovering
-						? "transparent"
-						: darkMode
-							? "white"
-							: "var(--secondary-color)",
-				}}
-				className={`border font-medium relative z-10 rounded-md ${sizeClasses[size]} ${className}`}
-				onMouseEnter={() => setIsHovering(true)}
-				onMouseLeave={() => setIsHovering(false)}
-				onClick={onClick}
-			>
-				<div className="flex items-center justify-center">
-					<SpinDialText text={text} isHovering={isHovering} duration={0.3} />
-				</div>
-			</button>
-		</div>
-	);
-};
-
-// Button 4: WarpDriveButton - Directional slide effect
+// Button 2: WarpDriveButton - WARP SPEED
 export const WarpDriveButton = ({
 	text = "WARP SPEED",
 	onClick,
 	className = "",
-	size = "md",
+	width = 300,
+	height = 80,
 }) => {
 	const { darkMode } = useTheme();
 	const [isHovering, setIsHovering] = useState(false);
 	const buttonRef = useRef(null);
 	const bgRef = useRef(null);
 	const warpLinesRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-4 py-1.5 text-xs",
-		md: "px-6 py-2.5 text-sm",
-		lg: "px-8 py-3 text-base",
-	};
 
 	// Theme-aware colors
 	const primaryColor = "var(--primary-color)";
@@ -500,11 +318,15 @@ export const WarpDriveButton = ({
 		<button
 			ref={buttonRef}
 			style={{
+				...baseButtonStyles,
 				backgroundColor: "transparent",
 				color: textColor,
 				borderColor: darkMode ? "white" : secondaryColor,
+				borderWidth: "2px",
+				width: `${width}px`,
+				height: `${height}px`,
 			}}
-			className={`border relative overflow-hidden font-medium rounded-md ${sizeClasses[size]} ${className}`}
+			className={`relative overflow-hidden font-medium rounded-md ${className}`}
 			onMouseEnter={() => setIsHovering(true)}
 			onMouseLeave={() => setIsHovering(false)}
 			onClick={onClick}
@@ -538,7 +360,7 @@ export const WarpDriveButton = ({
 			<div className="relative z-10 flex items-center justify-center">
 				<span>{text}</span>
 				<svg
-					className="w-3 h-3 sm:w-4 sm:h-4 ml-2"
+					className="w-4 h-4 ml-3"
 					viewBox="0 0 24 24"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
@@ -556,138 +378,18 @@ export const WarpDriveButton = ({
 	);
 };
 
-// Button 5: GravityWellButton - 3D push effect
-export const GravityWellButton = ({
-	text = "ENTER ORBIT",
-	onClick,
-	className = "",
-	size = "md",
-}) => {
-	const { darkMode } = useTheme();
-	const [isHovering, setIsHovering] = useState(false);
-	const [isPressed, setIsPressed] = useState(false);
-	const buttonRef = useRef(null);
-	const shadowRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-3 py-1.5 text-xs",
-		md: "px-5 py-2.5 text-sm",
-		lg: "px-6 py-3 text-base",
-	};
-
-	// Theme-aware colors
-	const bgColor = darkMode ? "var(--primary-color)" : "var(--secondary-color)";
-	const textColor = darkMode ? "black" : "white";
-	const shadowColor = darkMode
-		? "rgba(251, 204, 3, 0.5)"
-		: "rgba(57, 82, 153, 0.7)";
-
-	useEffect(() => {
-		if (!buttonRef.current || !shadowRef.current) return;
-
-		if (isPressed) {
-			// Pressed state - push down
-			gsap.to(buttonRef.current, {
-				y: 4,
-				duration: 0.1,
-			});
-			gsap.to(shadowRef.current, {
-				opacity: 0.1,
-				height: "2px",
-				duration: 0.1,
-			});
-		} else if (isHovering) {
-			// Hover state
-			gsap.to(buttonRef.current, {
-				y: 0,
-				scale: 1.02,
-				duration: 0.3,
-				ease: "power2.out",
-			});
-			gsap.to(shadowRef.current, {
-				opacity: 0.5,
-				height: "8px",
-				duration: 0.3,
-			});
-		} else {
-			// Normal state
-			gsap.to(buttonRef.current, {
-				y: 0,
-				scale: 1,
-				duration: 0.3,
-			});
-			gsap.to(shadowRef.current, {
-				opacity: 0.3,
-				height: "6px",
-				duration: 0.3,
-			});
-		}
-	}, [isHovering, isPressed]);
-
-	return (
-		<div className="relative">
-			{/* Shadow element */}
-			<div
-				ref={shadowRef}
-				style={{ backgroundColor: shadowColor }}
-				className="absolute bottom-0 left-0 right-0 h-6 opacity-30 blur-sm rounded-md"
-			/>
-
-			{/* Button element */}
-			<button
-				ref={buttonRef}
-				style={{ backgroundColor: bgColor, color: textColor }}
-				className={`font-medium relative rounded-md ${sizeClasses[size]} ${className}`}
-				onMouseEnter={() => setIsHovering(true)}
-				onMouseLeave={() => {
-					setIsHovering(false);
-					setIsPressed(false);
-				}}
-				onMouseDown={() => setIsPressed(true)}
-				onMouseUp={() => setIsPressed(false)}
-				onClick={onClick}
-			>
-				<div className="flex items-center justify-center relative z-10">
-					<SpinDialText text={text} isHovering={isHovering} duration={0.3} />
-					<svg
-						className="w-3 h-3 sm:w-4 sm:h-4 ml-2"
-						viewBox="0 0 24 24"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							d="M12 5L19 12M19 12L12 19M19 12H5"
-							stroke="currentColor"
-							strokeWidth="2.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						/>
-					</svg>
-				</div>
-			</button>
-		</div>
-	);
-};
-
-// Button 6: ConstellationButton - Stars appear on hover
+// Button 3: ConstellationButton - NAVIGATE STARS
 export const ConstellationButton = ({
 	text = "NAVIGATE STARS",
 	onClick,
 	className = "",
-	size = "md",
+	width = 300,
+	height = 80,
 }) => {
 	const { darkMode } = useTheme();
 	const [isHovering, setIsHovering] = useState(false);
 	const buttonRef = useRef(null);
 	const starsRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-3 py-1.5 text-xs",
-		md: "px-5 py-2.5 text-sm",
-		lg: "px-6 py-3 text-base",
-	};
 
 	// Theme-aware colors
 	const bgColor = darkMode ? "#111827" : "white";
@@ -754,11 +456,15 @@ export const ConstellationButton = ({
 		<button
 			ref={buttonRef}
 			style={{
+				...baseButtonStyles,
 				backgroundColor: bgColor,
 				color: textColor,
 				borderColor: borderColor,
+				borderWidth: "2px",
+				width: `${width}px`,
+				height: `${height}px`,
 			}}
-			className={`border font-medium relative overflow-hidden rounded-md ${sizeClasses[size]} ${className}`}
+			className={`relative overflow-hidden rounded-md ${className}`}
 			onMouseEnter={() => setIsHovering(true)}
 			onMouseLeave={() => setIsHovering(false)}
 			onClick={onClick}
@@ -787,7 +493,7 @@ export const ConstellationButton = ({
 			<div className="flex items-center justify-center relative z-10">
 				<span>{text}</span>
 				<svg
-					className="w-3 h-3 sm:w-4 sm:h-4 ml-2"
+					className="w-4 h-4 ml-3"
 					viewBox="0 0 24 24"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
@@ -805,26 +511,18 @@ export const ConstellationButton = ({
 	);
 };
 
-// Button 7: MeteorButton - Diagonal streaks on hover
-
-// Button 8: QuantumButton - Particle burst effect
+// Button 4: QuantumButton - QUANTUMJUMP
 export const QuantumButton = ({
-	text = "QUANTUM JUMP",
+	text = "QUANTUMJUMP",
 	onClick,
 	className = "",
-	size = "md",
+	width = 300,
+	height = 80,
 }) => {
 	const { darkMode } = useTheme();
 	const [isHovering, setIsHovering] = useState(false);
 	const buttonRef = useRef(null);
 	const particlesRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-3 py-1.5 text-xs",
-		md: "px-5 py-2.5 text-sm",
-		lg: "px-6 py-3 text-base",
-	};
 
 	// Theme-aware colors
 	const bgColor = darkMode ? "#111827" : "white";
@@ -907,13 +605,17 @@ export const QuantumButton = ({
 		<button
 			ref={buttonRef}
 			style={{
+				...baseButtonStyles,
 				backgroundColor: bgColor,
 				color: textColor,
 				borderColor: darkMode
 					? "var(--primary-color)"
 					: "var(--secondary-color)",
+				borderWidth: "2px",
+				width: `${width}px`,
+				height: `${height}px`,
 			}}
-			className={`border font-medium relative overflow-hidden rounded-md ${sizeClasses[size]} ${className}`}
+			className={`relative overflow-hidden rounded-md ${className}`}
 			onMouseEnter={() => setIsHovering(true)}
 			onMouseLeave={() => setIsHovering(false)}
 			onClick={onClick}
@@ -946,24 +648,18 @@ export const QuantumButton = ({
 	);
 };
 
-// Button 9: WormholeButton - Vortex effect
+// Button 5: WormholeButton - ENTER WORMHOLE
 export const WormholeButton = ({
 	text = "ENTER WORMHOLE",
 	onClick,
 	className = "",
-	size = "md",
+	width = 300,
+	height = 80,
 }) => {
 	const { darkMode } = useTheme();
 	const [isHovering, setIsHovering] = useState(false);
 	const buttonRef = useRef(null);
 	const vortexRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-3 py-1.5 text-xs",
-		md: "px-5 py-2.5 text-sm",
-		lg: "px-6 py-3 text-base",
-	};
 
 	// Theme-aware colors
 	const bgColor = darkMode ? "var(--secondary-color)" : "var(--primary-color)";
@@ -1006,10 +702,13 @@ export const WormholeButton = ({
 		<button
 			ref={buttonRef}
 			style={{
+				...baseButtonStyles,
 				backgroundColor: bgColor,
 				color: textColor,
+				width: `${width}px`,
+				height: `${height}px`,
 			}}
-			className={`font-medium relative overflow-hidden rounded-md ${sizeClasses[size]} ${className}`}
+			className={`relative overflow-hidden rounded-md ${className}`}
 			onMouseEnter={() => setIsHovering(true)}
 			onMouseLeave={() => setIsHovering(false)}
 			onClick={onClick}
@@ -1040,7 +739,7 @@ export const WormholeButton = ({
 			<div className="flex items-center justify-center relative z-10">
 				<span>{text}</span>
 				<svg
-					className="w-3 h-3 sm:w-4 sm:h-4 ml-2"
+					className="w-4 h-4 ml-3"
 					viewBox="0 0 24 24"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
@@ -1058,130 +757,19 @@ export const WormholeButton = ({
 	);
 };
 
-// Button 10: SolarFlareButton - Radial gradient burst
-export const SolarFlareButton = ({
-	text = "SOLAR FLARE",
-	onClick,
-	className = "",
-	size = "md",
-}) => {
-	const { darkMode } = useTheme();
-	const [isHovering, setIsHovering] = useState(false);
-	const buttonRef = useRef(null);
-	const flareRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-3 py-1.5 text-xs",
-		md: "px-5 py-2.5 text-sm",
-		lg: "px-6 py-3 text-base",
-	};
-
-	// Theme-aware colors
-	const bgColor = darkMode ? "#111827" : "white";
-	const textColor = darkMode
-		? "var(--primary-color)"
-		: "var(--secondary-color)";
-	const flareColor1 = darkMode
-		? "var(--primary-color)"
-		: "var(--primary-color)";
-	const flareColor2 = darkMode
-		? "var(--secondary-color)"
-		: "var(--secondary-color)";
-
-	useEffect(() => {
-		if (!buttonRef.current || !flareRef.current) return;
-
-		if (isHovering) {
-			// Flare animation
-			gsap.fromTo(
-				flareRef.current,
-				{
-					scale: 0,
-					opacity: 0,
-				},
-				{
-					scale: 1.5,
-					opacity: 0.7,
-					duration: 0.6,
-					ease: "power2.out",
-				},
-			);
-
-			// Button scaling
-			gsap.to(buttonRef.current, {
-				scale: 1.03,
-				duration: 0.3,
-			});
-		} else {
-			// Reset animations
-			gsap.to(flareRef.current, {
-				scale: 0,
-				opacity: 0,
-				duration: 0.4,
-			});
-
-			// Reset button
-			gsap.to(buttonRef.current, {
-				scale: 1,
-				duration: 0.3,
-			});
-		}
-	}, [isHovering]);
-
-	return (
-		<button
-			ref={buttonRef}
-			style={{
-				backgroundColor: bgColor,
-				color: textColor,
-				borderColor: darkMode
-					? "var(--primary-color)"
-					: "var(--secondary-color)",
-			}}
-			className={`border font-medium relative overflow-hidden rounded-md ${sizeClasses[size]} ${className}`}
-			onMouseEnter={() => setIsHovering(true)}
-			onMouseLeave={() => setIsHovering(false)}
-			onClick={onClick}
-		>
-			{/* Solar flare */}
-			<div
-				ref={flareRef}
-				className="absolute inset-0 pointer-events-none"
-				style={{
-					background: `radial-gradient(circle, ${flareColor1} 0%, ${flareColor2} 70%, transparent 100%)`,
-					opacity: 0,
-					transform: "scale(0)",
-				}}
-			/>
-
-			{/* Button content */}
-			<div className="flex items-center justify-center relative z-10">
-				<SpinDialText text={text} isHovering={isHovering} duration={0.3} />
-			</div>
-		</button>
-	);
-};
-
-// Button 11: BlackHoleButton - Suction effect
+// Button 6: BlackHoleButton - BLACK HOLE
 export const BlackHoleButton = ({
 	text = "BLACK HOLE",
 	onClick,
 	className = "",
-	size = "md",
+	width = 300,
+	height = 80,
 }) => {
 	const { darkMode } = useTheme();
 	const [isHovering, setIsHovering] = useState(false);
 	const buttonRef = useRef(null);
 	const holeRef = useRef(null);
 	const particlesRef = useRef(null);
-
-	// Size classes mapping
-	const sizeClasses = {
-		sm: "px-3 py-1.5 text-xs",
-		md: "px-5 py-2.5 text-sm",
-		lg: "px-6 py-3 text-base",
-	};
 
 	// Theme-aware colors
 	const bgColor = darkMode ? "#111827" : "white";
@@ -1272,13 +860,17 @@ export const BlackHoleButton = ({
 		<button
 			ref={buttonRef}
 			style={{
+				...baseButtonStyles,
 				backgroundColor: bgColor,
 				color: textColor,
 				borderColor: darkMode
 					? "var(--primary-color)"
 					: "var(--secondary-color)",
+				borderWidth: "2px",
+				width: `${width}px`,
+				height: `${height}px`,
 			}}
-			className={`border font-medium relative overflow-hidden rounded-md ${sizeClasses[size]} ${className}`}
+			className={`relative overflow-hidden rounded-md ${className}`}
 			onMouseEnter={() => setIsHovering(true)}
 			onMouseLeave={() => setIsHovering(false)}
 			onClick={onClick}
@@ -1288,13 +880,13 @@ export const BlackHoleButton = ({
 				ref={holeRef}
 				className="absolute rounded-full"
 				style={{
-					width: "20px",
-					height: "20px",
+					width: "30px",
+					height: "30px",
 					backgroundColor: holeColor,
 					left: "50%",
 					top: "50%",
 					transform: "translate(-50%, -50%)",
-					boxShadow: `0 0 10px ${holeColor}`,
+					boxShadow: `0 0 15px ${holeColor}`,
 				}}
 			/>
 
@@ -1320,6 +912,150 @@ export const BlackHoleButton = ({
 			{/* Button content */}
 			<div className="flex items-center justify-center relative z-10">
 				<span>{text}</span>
+			</div>
+		</button>
+	);
+};
+
+// Button 7: MeteorButton - New meteor-themed button
+export const MeteorButton = ({
+	text = "METEOR STORM",
+	onClick,
+	className = "",
+	width = 300,
+	height = 80,
+}) => {
+	const { darkMode } = useTheme();
+	const [isHovering, setIsHovering] = useState(false);
+	const buttonRef = useRef(null);
+	const meteorsRef = useRef(null);
+
+	// Theme-aware colors
+	const bgColor = darkMode ? "#111827" : "white";
+	const textColor = darkMode
+		? "var(--primary-color)"
+		: "var(--secondary-color)";
+	const meteorColor = darkMode
+		? "var(--primary-color)"
+		: "var(--secondary-color)";
+
+	// Generate meteors
+	const meteors = Array(5)
+		.fill(0)
+		.map(() => ({
+			left: `${Math.random() * 100}%`,
+			top: `${Math.random() * 100}%`,
+			angle: Math.random() * 30 + 30, // Between 30-60 degrees
+			length: `${Math.random() * 50 + 50}px`,
+			speed: Math.random() * 0.5 + 0.5,
+			delay: Math.random() * 1,
+		}));
+
+	useEffect(() => {
+		if (!buttonRef.current || !meteorsRef.current) return;
+
+		if (isHovering) {
+			// Animate meteors
+			Array.from(meteorsRef.current.children).forEach((meteor, index) => {
+				const { angle, length, speed, delay } = meteors[index];
+				const radians = angle * (Math.PI / 180);
+				const x = Math.cos(radians) * 200;
+				const y = Math.sin(radians) * 200;
+
+				gsap.fromTo(
+					meteor,
+					{
+						x: -x,
+						y: -y,
+						opacity: 0,
+					},
+					{
+						x: x,
+						y: y,
+						opacity: 1,
+						duration: speed,
+						delay: delay,
+						repeat: -1,
+						repeatDelay: 2,
+						ease: "power1.in",
+						onComplete: () => {
+							gsap.set(meteor, {
+								x: -x,
+								y: -y,
+								opacity: 0,
+							});
+						},
+					},
+				);
+			});
+
+			// Button glow
+			gsap.to(buttonRef.current, {
+				boxShadow: `0 0 15px ${darkMode ? "rgba(251, 204, 3, 0.5)" : "rgba(57, 82, 153, 0.5)"}`,
+				duration: 0.3,
+			});
+		} else {
+			// Stop animations
+			Array.from(meteorsRef.current.children).forEach((meteor) => {
+				gsap.killTweensOf(meteor);
+				gsap.set(meteor, {
+					x: 0,
+					y: 0,
+					opacity: 0,
+				});
+			});
+
+			// Remove glow
+			gsap.to(buttonRef.current, {
+				boxShadow: "none",
+				duration: 0.3,
+			});
+		}
+	}, [isHovering, darkMode]);
+
+	return (
+		<button
+			ref={buttonRef}
+			style={{
+				...baseButtonStyles,
+				backgroundColor: bgColor,
+				color: textColor,
+				borderColor: darkMode
+					? "var(--primary-color)"
+					: "var(--secondary-color)",
+				borderWidth: "2px",
+				width: `${width}px`,
+				height: `${height}px`,
+			}}
+			className={`relative overflow-hidden rounded-md ${className}`}
+			onMouseEnter={() => setIsHovering(true)}
+			onMouseLeave={() => setIsHovering(false)}
+			onClick={onClick}
+		>
+			{/* Meteors */}
+			<div ref={meteorsRef} className="absolute inset-0 pointer-events-none">
+				{meteors.map((meteor, index) => (
+					<div
+						key={index}
+						className="absolute"
+						style={{
+							left: meteor.left,
+							top: meteor.top,
+							width: meteor.length,
+							height: "2px",
+							backgroundColor: meteorColor,
+							opacity: 0,
+							transform: `rotate(${meteor.angle}deg)`,
+							transformOrigin: "left center",
+							boxShadow: `0 0 5px ${meteorColor}`,
+						}}
+					/>
+				))}
+			</div>
+
+			{/* Button content */}
+			<div className="flex items-center justify-center relative z-10">
+				<SpinDialText text={text} isHovering={isHovering} duration={0.3} />
 			</div>
 		</button>
 	);
