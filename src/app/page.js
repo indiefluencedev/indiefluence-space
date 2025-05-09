@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroSection from "@/components/home/HeroSection";
 import StraightSection from "@/components/home/ServiceSection";
-import { Button3 } from "@/components/UI/SpinDielButton";
+import { CosmicPulseButton } from "@/components/UI/SpinDielButton";
 import ClientsTestimonialsSection from "@/components/home/ClientsTestimonialsSection";
 
 // Register GSAP plugin
@@ -235,7 +235,12 @@ export default function Home() {
 					</span>
 				</h2>
 				<div ref={buttonRef} className="inline-block">
-					<Button3 text="Let's Work Together" className="mt-8" />
+					<CosmicPulseButton
+						className="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-yellow-500 focus:ring-offset-yellow-200"
+						style={{ padding: "10px 20px", fontSize: "1.2rem" }}
+					>
+						Contact Us
+					</CosmicPulseButton>
 				</div>
 			</div>
 		</section>

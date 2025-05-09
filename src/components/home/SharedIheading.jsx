@@ -4,11 +4,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
 import {
-	Button1,
-	Button2,
-	Button3,
-	Button4,
-	Button5,
+	CosmicPulseButton,
+	OrbitalButton,
+	NebulaButton,
+	WarpDriveButton,
+	GravityWellButton,
+	ConstellationButton,
+	QuantumButton,
+	WormholeButton,
+	SolarFlareButton,
+	BlackHoleButton,
 } from "../UI/SpinDielButton";
 gsap.registerPlugin(TextPlugin);
 
@@ -333,7 +338,19 @@ const SharedHeading = () => {
 					</span>
 				</p>
 
-				<Button3 />
+				<CosmicPulseButton />
+				<OrbitalButton />
+				<NebulaButton />
+				<WarpDriveButton />
+				<GravityWellButton />
+				<ConstellationButton />
+				{/* <MeteorButton /> */}
+				<QuantumButton />
+				<WormholeButton />
+				<SolarFlareButton />
+				<BlackHoleButton />
+
+				{/* Button with hover effect */}
 			</div>
 		</div>
 	);

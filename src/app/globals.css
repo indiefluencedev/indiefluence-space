@@ -1,4 +1,6 @@
 /* app/globals.css */
+
+/* app/globals.css */
 @import "tailwindcss";
 
 @theme {
@@ -27,6 +29,7 @@
 }
 
 :root {
+	/* Base theme variables */
 	--foreground-rgb: 0, 0, 0;
 	--background-start-rgb: 255, 255, 255;
 	--background-end-rgb: 255, 255, 255;
@@ -34,6 +37,29 @@
 	--secondary-color: #395299;
 	--font-primary: var(--font-manrope);
 	--font-secondary: var(--font-Orbitron);
+
+	/* Theme-enabled text and background colors */
+	--text-color: rgb(var(--foreground-rgb));
+	--bg-color: linear-gradient(
+		to bottom,
+		rgb(var(--background-start-rgb)),
+		rgb(var(--background-end-rgb))
+	);
+	--border-color: rgb(var(--foreground-rgb), 0.2);
+
+	/* Theme hover states - add these */
+	--hover-bg-light: #000000;
+	--hover-text-light: #ffffff;
+	--hover-border-light: #000000;
+
+	--hover-bg-dark: #ffffff;
+	--hover-text-dark: #000000;
+	--hover-border-dark: #ffffff;
+
+	/* Active state theme variables */
+	--hover-bg: var(--hover-bg-light);
+	--hover-text: var(--hover-text-light);
+	--hover-border: var(--hover-border-light);
 }
 
 [data-dark-mode="true"] {
@@ -43,6 +69,49 @@
 	--primary-color: #fbcc03;
 	--secondary-color: #395299;
 	color-scheme: dark only;
+
+	--hover-bg: var(--hover-bg-dark);
+	--hover-text: var(--hover-text-dark);
+	--hover-border: var(--hover-border-dark);
+}
+
+/* Theme utility classes */
+.text-default {
+	color: var(--text-color);
+}
+
+.bg-default {
+	background: var(--bg-color);
+}
+
+.border-default {
+	border-color: var(--border-color);
+}
+.btn-theme {
+	background-color: transparent;
+	color: var(--text-color);
+	border: 1px solid var(--border-color);
+	transition: all 0.3s ease;
+}
+
+.btn-theme:hover {
+	background-color: var(--hover-bg);
+	color: var(--hover-text);
+	border-color: var(--hover-border);
+}
+
+/* Alternative with Tailwind classes */
+/* You can add these utility classes */
+.hover-bg-theme:hover {
+	background-color: var(--hover-bg);
+}
+
+.hover-text-theme:hover {
+	color: var(--hover-text);
+}
+
+.hover-border-theme:hover {
+	border-color: var(--hover-border);
 }
 
 /* Example usage in your components */
@@ -61,17 +130,13 @@ div,
 span {
 	font-family: var(--font-primary);
 }
+
 body {
-	color: rgb(var(--foreground-rgb));
-	background: linear-gradient(
-		to bottom,
-		rgb(var(--background-start-rgb)),
-		rgb(var(--background-end-rgb))
-	);
+	color: var(--text-color);
+	background: var(--bg-color);
 	transition: background-color 0.3s ease, color 0.3s ease;
 	min-height: 100vh;
 	font-family: sans-serif, system-ui;
-	/* All placement, centering, display, and alignment properties removed */
 }
 
 /* Smooth transitions for dark mode - only apply to specific elements */

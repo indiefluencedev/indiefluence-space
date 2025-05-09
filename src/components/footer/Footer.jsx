@@ -286,31 +286,10 @@ const Footer = () => {
 			>
 				<h1 className="text-[4rem] md:text-[8rem] lg:text-[12rem] font-bold ml-7 text-white text-left">
 					LET'S CONECT{" "}
-					<svg
-						width="120"
-						height="120"
-						viewBox="0 0 80 80"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						className="text-white"
-					>
-						<path
-							d="M16 64L64 16"
-							stroke="currentColor"
-							strokeWidth="4"
-							strokeLinecap="square"
-						/>
-						<path
-							d="M24 16H64V56"
-							stroke="currentColor"
-							strokeWidth="4"
-							strokeLinecap="square"
-						/>
-					</svg>
 				</h1>
 				{/* Bigger Diagonal Arrow */}
-				{/* <motion.div
-					className="absolute right-6 md:right-16 lg:right-24 xl:right-32 top-8 lg:top-8"
+				<motion.div
+					className="absolute right-6 md:right-16 lg:right-24 xl:right-32 top-8 lg:top-20 xl:top-24"
 					initial={{ opacity: 0, x: -20, y: 20 }}
 					animate={{ opacity: 1, x: 0, y: 0 }}
 					transition={{ duration: 0.8, delay: 1.2 }}
@@ -336,7 +315,7 @@ const Footer = () => {
 							strokeLinecap="square"
 						/>
 					</svg>
-				</motion.div> */}
+				</motion.div>
 			</motion.div>
 		</footer>
 	);
