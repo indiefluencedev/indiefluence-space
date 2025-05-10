@@ -2,6 +2,7 @@
 import { useScroll, useTransform, motion } from "motion/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/context/TheamContext"; // Import your theme context
+import HeadingComponent from "@/components/UI/HeadingComponent"; // Import your heading component
 
 export const Timeline = () => {
 	const ref = useRef(null);
@@ -141,35 +142,17 @@ export const Timeline = () => {
 			</div>
 
 			{/* Heading Section - 400px height */}
-			<section
-				className={`w-full h-[400px] flex flex-col justify-center items-center border-b ${darkMode ? "border-gray-800" : "border-gray-200"}`}
-			>
-				<div className="w-full max-w-7xl mx-auto px-8">
-					<div className="flex justify-between items-center w-full">
-						<div className="flex items-center">
-							<span
-								className={`text-sm font-mono opacity-50 ${darkMode ? "text-white" : "text-neutral-900"}`}
-							>
-								ABOUT
-							</span>
-						</div>
-						<h1
-							className={`text-5xl md:text-6xl font-bold text-center ${darkMode ? "text-white" : "text-neutral-900"}`}
-						>
-							Our journey from
-							<br />
-							idea to influence
-						</h1>
-						<div className="flex items-center">
-							<span
-								className={`text-sm font-mono opacity-50 ${darkMode ? "text-white" : "text-neutral-700"}`}
-							>
-								/002
-							</span>
-						</div>
-					</div>
-				</div>
-			</section>
+			<HeadingComponent
+				sectionLabel="ABOUT"
+				title={
+					<>
+						Our journey from
+						<br />
+						idea to influence
+					</>
+				}
+				sectionNumber="002"
+			/>
 
 			<div
 				className={`w-full bg-transparent font-sans md:px-10 transition-colors duration-300 ${darkMode ? "bg-gray-900" : ""}`}

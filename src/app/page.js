@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroSection from "@/components/home/HeroSection";
 import StraightSection from "@/components/home/ServiceSection";
-import { CosmicPulseButton } from "@/components/UI/SpinDielButton";
+import { QuantumButton } from "@/components/UI/SpinDielButton";
 import ClientsTestimonialsSection from "@/components/home/ClientsTestimonialsSection";
 import LogoMarquee from "@/components/home/LogoMarquee";
 import BrandsMarquee from "@/components/home/BrandsMarquee";
@@ -237,12 +237,12 @@ export default function Home() {
 					</span>
 				</h2>
 				<div ref={buttonRef} className="inline-block">
-					<CosmicPulseButton
+					<QuantumButton
 						className="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-yellow-500 focus:ring-offset-yellow-200"
 						style={{ padding: "10px 20px", fontSize: "1.2rem" }}
 					>
 						Contact Us
-					</CosmicPulseButton>
+					</QuantumButton>
 				</div>
 			</div>
 		</section>
@@ -256,9 +256,9 @@ export default function Home() {
 			</div>
 			{/* Parallax section slides up from beneath, overlapping HeroSection at the start */}
 			<div className="relative z-10 -mt-32">{renderParallaxSection()}</div>
-			<BrandsMarquee/>
+			<BrandsMarquee />
 			<StraightSection />
-			<LogoMarquee/>
+			<LogoMarquee />
 			<ClientsTestimonialsSection />
 		</div>
 	);
