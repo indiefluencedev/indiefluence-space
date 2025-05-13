@@ -3,15 +3,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
+import { useTheme } from "@/context/TheamContext";
 
 gsap.registerPlugin(TextPlugin);
 
-// SpinDialText Component - For text animation effect
-const SpinDialText = ({ text = "BUTTON", isHovering, duration = 0.5 }) => {
+// SpinDialText Component - For the text animation inside the button
+const SpinDialText = ({ text = "BUTTON", animate, duration = 0.5 }) => {
 	const charRefs = useRef([]);
 
 	useEffect(() => {
-		if (!isHovering) return;
+		if (!animate) return;
 
 		// Cancel any existing animations
 		charRefs.current.forEach((ref) => {
@@ -49,7 +50,7 @@ const SpinDialText = ({ text = "BUTTON", isHovering, duration = 0.5 }) => {
 				},
 			);
 		});
-	}, [isHovering, text, duration]);
+	}, [animate, text, duration]);
 
 	return (
 		<span className="inline-flex">
@@ -69,8 +70,6 @@ const SpinDialText = ({ text = "BUTTON", isHovering, duration = 0.5 }) => {
 
 // Base Button Styles
 const baseButtonStyles = {
-	minWidth: 300,
-	minHeight: 80,
 	display: "flex",
 	alignItems: "center",
 	justifyContent: "center",
@@ -81,19 +80,92 @@ const baseButtonStyles = {
 	transition: "all 0.3s ease",
 };
 
-// Enhanced QuantumButton component
+// Floating Particle Component
+const FloatingParticles = ({ darkMode }) => {
+	const particlesRef = useRef(null);
+	const particleColor = darkMode
+		? "var(--primary-color)"
+		: "var(--secondary-color)";
+
+	// Create more particles (30) for better visibility
+	const floatingParticles = Array(30)
+		.fill(0)
+		.map(() => ({
+			left: `${Math.random() * 100}%`,
+			top: `${Math.random() * 100}%`,
+			size: `${Math.random() * 3 + 1}px`,
+			duration: Math.random() * 10 + 10,
+			delay: Math.random() * 5,
+		}));
+
+	useEffect(() => {
+		if (!particlesRef.current) return;
+
+		Array.from(particlesRef.current.children).forEach((particle, index) => {
+			const { duration, delay } = floatingParticles[index];
+
+			// Create floating animation
+			gsap.to(particle, {
+				y: `${Math.random() * 20 - 10}px`,
+				x: `${Math.random() * 20 - 10}px`,
+				duration: duration,
+				delay: delay,
+				repeat: -1,
+				yoyo: true,
+				ease: "sine.inOut",
+			});
+
+			// Pulse opacity
+			gsap.to(particle, {
+				opacity: 0.3,
+				duration: Math.random() * 2 + 2,
+				repeat: -1,
+				yoyo: true,
+				ease: "sine.inOut",
+			});
+		});
+
+		return () => {
+			Array.from(particlesRef.current?.children || []).forEach((particle) => {
+				gsap.killTweensOf(particle);
+			});
+		};
+	}, []);
+
+	return (
+		<div
+			ref={particlesRef}
+			className="absolute inset-0 pointer-events-none overflow-hidden"
+		>
+			{floatingParticles.map((particle, index) => (
+				<div
+					key={index}
+					className="absolute rounded-full"
+					style={{
+						left: particle.left,
+						top: particle.top,
+						width: particle.size,
+						height: particle.size,
+						backgroundColor: particleColor,
+						opacity: 0.5,
+						boxShadow: `0 0 3px ${particleColor}`,
+					}}
+				/>
+			))}
+		</div>
+	);
+};
+
+// Button 4: QuantumButton - QUANTUMJUMP
 export const QuantumButton = ({
 	text = "QUANTUMJUMP",
 	onClick,
 	className = "",
-	width = 300,
-	height = 80,
-	darkMode = false,
 }) => {
-	const [isHovering, setIsHovering] = useState(false);
+	const { darkMode } = useTheme();
+	const [isAnimating, setIsAnimating] = useState(false);
 	const buttonRef = useRef(null);
-	const staticParticlesRef = useRef(null);
-	const dynamicParticlesRef = useRef(null);
+	const particlesRef = useRef(null);
 
 	// Theme-aware colors
 	const bgColor = darkMode ? "#111827" : "white";
@@ -104,144 +176,76 @@ export const QuantumButton = ({
 		? "var(--primary-color)"
 		: "var(--secondary-color)";
 
-	// Generate static particles (always visible)
-	const staticParticles = Array(8)
-		.fill(0)
-		.map(() => ({
-			left: `${Math.random() * 100}%`,
-			top: `${Math.random() * 100}%`,
-			size: `${Math.random() * 3 + 1}px`,
-			pulseDelay: Math.random() * 2,
-		}));
-
-	// Generate dynamic particles (visible on hover)
-	const dynamicParticles = Array(20)
+	// Generate explosion particles
+	const explosionParticles = Array(30) // Increased from 15 to 30 for more visibility
 		.fill(0)
 		.map(() => ({
 			left: "50%",
 			top: "50%",
-			size: `${Math.random() * 4 + 2}px`,
+			size: `${Math.random() * 5 + 2}px`, // Slightly larger particles
 			angle: Math.random() * Math.PI * 2,
-			distance: Math.random() * 60 + 40, // Increased distance for better spread
+			distance: Math.random() * 60 + 40, // Increased distance
 		}));
 
-	// Handle static particles pulsing animation
-	useEffect(() => {
-		if (!staticParticlesRef.current) return;
+	const triggerAnimation = () => {
+		setIsAnimating(true);
+		setTimeout(() => setIsAnimating(false), 1000);
+	};
 
-		// Create pulsing animation for static particles
-		Array.from(staticParticlesRef.current.children).forEach(
-			(particle, index) => {
-				gsap.to(particle, {
-					opacity: 0.2,
-					scale: 0.7,
-					duration: 1.5,
-					repeat: -1,
-					yoyo: true,
-					delay: staticParticles[index].pulseDelay,
-					ease: "sine.inOut",
+	// Animation effect
+	useEffect(() => {
+		if (!buttonRef.current || !particlesRef.current || !isAnimating) return;
+
+		// Animate particles outward
+		Array.from(particlesRef.current.children).forEach((particle, index) => {
+			const { angle, distance } = explosionParticles[index];
+			const x = Math.cos(angle) * distance;
+			const y = Math.sin(angle) * distance;
+
+			gsap.fromTo(
+				particle,
+				{
+					opacity: 0,
+					x: 0,
+					y: 0,
+					scale: 0,
+				},
+				{
+					opacity: 1,
+					x: x,
+					y: y,
+					scale: 1,
+					duration: 0.6,
+					delay: Math.random() * 0.3,
+					ease: "power2.out",
+					onComplete: () => {
+						gsap.to(particle, {
+							opacity: 0,
+							duration: 0.3,
+						});
+					},
+				},
+			);
+		});
+
+		// Button pulse
+		gsap.to(buttonRef.current, {
+			scale: 1.05,
+			duration: 0.3,
+			ease: "back.out(1.7)",
+			onComplete: () => {
+				gsap.to(buttonRef.current, {
+					scale: 1,
+					duration: 0.3,
 				});
 			},
-		);
+		});
+	}, [isAnimating]);
 
-		// Cleanup
-		return () => {
-			Array.from(staticParticlesRef.current?.children || []).forEach(
-				(particle) => {
-					gsap.killTweensOf(particle);
-				},
-			);
-		};
-	}, []);
-
-	// Handle hover animations
-	useEffect(() => {
-		if (!buttonRef.current || !dynamicParticlesRef.current) return;
-
-		if (isHovering) {
-			// Animate particles outward
-			Array.from(dynamicParticlesRef.current.children).forEach(
-				(particle, index) => {
-					const { angle, distance } = dynamicParticles[index];
-					const x = Math.cos(angle) * distance;
-					const y = Math.sin(angle) * distance;
-
-					gsap.fromTo(
-						particle,
-						{
-							opacity: 0,
-							x: 0,
-							y: 0,
-							scale: 0,
-						},
-						{
-							opacity: 1,
-							x: x,
-							y: y,
-							scale: 1.2,
-							duration: 0.8,
-							delay: Math.random() * 0.2,
-							ease: "power2.out",
-							onComplete: () => {
-								gsap.to(particle, {
-									opacity: 0,
-									scale: 0.5,
-									duration: 0.4,
-									delay: 0.2,
-								});
-							},
-						},
-					);
-				},
-			);
-
-			// Button pulse and glow effect
-			gsap.to(buttonRef.current, {
-				scale: 1.05,
-				boxShadow: `0 0 20px ${darkMode ? "rgba(251, 204, 3, 0.5)" : "rgba(57, 82, 153, 0.5)"}`,
-				duration: 0.3,
-				ease: "back.out(1.7)",
-			});
-
-			// Also enhance static particles
-			Array.from(staticParticlesRef.current.children).forEach((particle) => {
-				gsap.to(particle, {
-					opacity: 0.8,
-					scale: 1.5,
-					duration: 0.5,
-				});
-			});
-		} else {
-			// Stop animations for dynamic particles
-			Array.from(dynamicParticlesRef.current.children).forEach((particle) => {
-				gsap.killTweensOf(particle);
-				gsap.set(particle, { opacity: 0, x: 0, y: 0 });
-			});
-
-			// Reset button
-			gsap.to(buttonRef.current, {
-				scale: 1,
-				boxShadow: "none",
-				duration: 0.3,
-			});
-
-			// Reset static particles to normal pulsing
-			Array.from(staticParticlesRef.current.children).forEach(
-				(particle, index) => {
-					gsap.killTweensOf(particle);
-					gsap.to(particle, {
-						opacity: 0.2,
-						scale: 0.7,
-						duration: 1.5,
-						repeat: -1,
-						yoyo: true,
-						delay: staticParticles[index].pulseDelay,
-						ease: "sine.inOut",
-					});
-				},
-			);
-		}
-	}, [isHovering]);
+	const handleClick = (e) => {
+		triggerAnimation();
+		if (onClick) onClick(e);
+	};
 
 	return (
 		<button
@@ -254,44 +258,19 @@ export const QuantumButton = ({
 					? "var(--primary-color)"
 					: "var(--secondary-color)",
 				borderWidth: "2px",
-				width: `${width}px`,
-				height: `${height}px`,
 			}}
-			className={`relative overflow-hidden rounded-md ${className}`}
-			onMouseEnter={() => setIsHovering(true)}
-			onMouseLeave={() => setIsHovering(false)}
-			onClick={onClick}
+			className={`relative overflow-hidden rounded-md w-[300px] h-[80px] md:w-[300px] md:h-[80px] ${className}`}
+			onMouseEnter={triggerAnimation}
+			onClick={handleClick}
 		>
-			{/* Static Particles - Always visible with subtle animation */}
-			<div
-				ref={staticParticlesRef}
-				className="absolute inset-0 pointer-events-none"
-			>
-				{staticParticles.map((particle, index) => (
-					<div
-						key={`static-${index}`}
-						className="absolute rounded-full"
-						style={{
-							left: particle.left,
-							top: particle.top,
-							width: particle.size,
-							height: particle.size,
-							backgroundColor: particleColor,
-							opacity: 0.4,
-							boxShadow: `0 0 4px ${particleColor}`,
-						}}
-					/>
-				))}
-			</div>
+			{/* Floating Particles (always visible) */}
+			<FloatingParticles darkMode={darkMode} />
 
-			{/* Dynamic Particles - Appear on hover with explosion effect */}
-			<div
-				ref={dynamicParticlesRef}
-				className="absolute inset-0 pointer-events-none"
-			>
-				{dynamicParticles.map((particle, index) => (
+			{/* Explosion Particles (visible on hover/click) */}
+			<div ref={particlesRef} className="absolute inset-0 pointer-events-none">
+				{explosionParticles.map((particle, index) => (
 					<div
-						key={`dynamic-${index}`}
+						key={index}
 						className="absolute rounded-full"
 						style={{
 							left: particle.left,
@@ -301,7 +280,7 @@ export const QuantumButton = ({
 							backgroundColor: particleColor,
 							opacity: 0,
 							transform: "scale(0)",
-							boxShadow: `0 0 6px ${particleColor}`,
+							boxShadow: `0 0 5px ${particleColor}`,
 						}}
 					/>
 				))}
@@ -309,110 +288,9 @@ export const QuantumButton = ({
 
 			{/* Button content */}
 			<div className="flex items-center justify-center relative z-10">
-				<SpinDialText text={text} isHovering={isHovering} duration={0.3} />
+				<SpinDialText text={text} animate={isAnimating} duration={0.3} />
 			</div>
 		</button>
-	);
-};
-
-// Demo/Example component
-export const QuantumButtonDemo = () => {
-	const [darkMode, setDarkMode] = useState(false);
-	const [buttonSize, setButtonSize] = useState({ width: 300, height: 80 });
-
-	const handleButtonClick = () => {
-		console.log("Quantum button clicked!");
-	};
-
-	const toggleDarkMode = () => {
-		setDarkMode(!darkMode);
-	};
-
-	const handleSizeChange = (e, dimension) => {
-		const value = Math.max(
-			dimension === "width" ? 300 : 80,
-			parseInt(e.target.value) || 0,
-		);
-		setButtonSize((prev) => ({ ...prev, [dimension]: value }));
-	};
-
-	return (
-		<div
-			className={`p-8 min-h-screen flex flex-col items-center justify-center transition-colors duration-300 ${
-				darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-			}`}
-		>
-			<style jsx global>{`
-        :root {
-          --primary-color: ${darkMode ? "#FBCC03" : "#395299"};
-          --secondary-color: ${darkMode ? "#395299" : "#FBCC03"};
-        }
-      `}</style>
-
-			<h1 className="text-2xl font-bold mb-8">Quantum Button Demo</h1>
-
-			<div className="mb-8">
-				<QuantumButton
-					text="QUANTUMJUMP"
-					onClick={handleButtonClick}
-					darkMode={darkMode}
-					width={buttonSize.width}
-					height={buttonSize.height}
-				/>
-			</div>
-
-			<div className="w-full max-w-md space-y-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-				<div>
-					<label className="flex items-center cursor-pointer">
-						<div className="mr-3 text-gray-700 dark:text-gray-300 font-medium">
-							Dark Mode
-						</div>
-						<div className="relative">
-							<input
-								type="checkbox"
-								checked={darkMode}
-								onChange={toggleDarkMode}
-								className="sr-only"
-							/>
-							<div
-								className={`block w-14 h-8 rounded-full ${darkMode ? "bg-blue-600" : "bg-gray-300"}`}
-							></div>
-							<div
-								className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${
-									darkMode ? "transform translate-x-6" : ""
-								}`}
-							></div>
-						</div>
-					</label>
-				</div>
-
-				<div>
-					<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-						Width (min 300px)
-					</label>
-					<input
-						type="number"
-						min="300"
-						value={buttonSize.width}
-						onChange={(e) => handleSizeChange(e, "width")}
-						className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-					/>
-				</div>
-
-				<div>
-					<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-						Height (min 80px)
-					</label>
-					<input
-						type="number"
-						min="80"
-						value={buttonSize.height}
-						onChange={(e) => handleSizeChange(e, "height")}
-						className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-					/>
-				</div>
-			</div>
-		</div>
 	);
 };
 

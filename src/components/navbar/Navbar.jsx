@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import DarkModeToggle from "./toggle/DarkModeToggle";
 
@@ -15,50 +16,121 @@ const navLinks = [
 ];
 
 const Navbar = () => {
+	const pathname = usePathname();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [isVisible, setIsVisible] = useState(true);
 	const [lastScrollY, setLastScrollY] = useState(0);
+	const [isClosing, setIsClosing] = useState(false);
 	const menuRef = useRef(null);
 	const menuItemsRef = useRef([]);
 	const contactBtnRef = useRef(null);
 	const arrowRef = useRef(null);
 	const navbarRef = useRef(null);
+	const animationRef = useRef(null);
 
 	const toggleMenu = () => {
-		setMenuOpen(!menuOpen);
+		if (menuOpen) {
+			closeMenu();
+		} else {
+			openMenu();
+		}
 	};
 
-	// Scroll behavior
+	const openMenu = () => {
+		setMenuOpen(true);
+		setIsClosing(false);
+	};
+
+	const closeMenu = () => {
+		if (animationRef.current) {
+			animationRef.current.kill();
+		}
+
+		setIsClosing(true);
+
+		// Animate menu close
+		gsap.to(menuRef.current, {
+			height: 0,
+			opacity: 0,
+			duration: 0.3,
+			ease: "power2.in",
+			onComplete: () => {
+				setMenuOpen(false);
+				setIsClosing(false);
+			},
+		});
+
+		// Animate items out
+		gsap.to(menuItemsRef.current, {
+			opacity: 0,
+			y: 20,
+			duration: 0.2,
+			stagger: -0.1,
+			ease: "power2.in",
+		});
+
+		gsap.to([contactBtnRef.current, arrowRef.current], {
+			opacity: 0,
+			y: 20,
+			duration: 0.2,
+			ease: "power2.in",
+		});
+	};
+
+	// Close menu when route changes
+	useEffect(() => {
+		if (menuOpen) {
+			closeMenu();
+		}
+	}, [pathname]);
+
+	// Improved scroll behavior with smooth transitions
 	useEffect(() => {
 		const controlNavbar = () => {
 			const currentScrollY = window.scrollY;
 
-			if (currentScrollY > lastScrollY) {
-				// scrolling down
-				setIsVisible(false);
+			// Only start hiding navbar after scrolling down a bit
+			if (currentScrollY > 100) {
+				if (currentScrollY > lastScrollY && currentScrollY - lastScrollY > 5) {
+					// scrolling down
+					setIsVisible(false);
+				} else if (lastScrollY - currentScrollY > 5) {
+					// scrolling up
+					setIsVisible(true);
+				}
 			} else {
-				// scrolling up
+				// at top of page
 				setIsVisible(true);
 			}
 
 			setLastScrollY(currentScrollY);
 		};
 
-		window.addEventListener("scroll", controlNavbar);
+		window.addEventListener("scroll", controlNavbar, { passive: true });
 
 		return () => {
 			window.removeEventListener("scroll", controlNavbar);
 		};
 	}, [lastScrollY]);
 
-	// GSAP animations
+	// GSAP animations for menu open
 	useEffect(() => {
-		if (menuOpen) {
+		if (menuOpen && !isClosing) {
+			// Clean up any existing animations
+			if (animationRef.current) {
+				animationRef.current.kill();
+			}
+
 			// Menu open animation
-			gsap.fromTo(
+			animationRef.current = gsap.fromTo(
 				menuRef.current,
 				{ opacity: 0, height: 0 },
-				{ opacity: 1, height: "auto", duration: 0.5, ease: "power3.out" },
+				{
+					opacity: 1,
+					height: "auto",
+					duration: 0.4,
+					ease: "power2.out",
+				},
 			);
 
 			// Animate each menu item with staggered delay
@@ -68,9 +140,9 @@ const Navbar = () => {
 				{
 					opacity: 1,
 					y: 0,
-					duration: 0.4,
-					stagger: 0.1,
-					ease: "power2.out",
+					duration: 0.3,
+					stagger: 0.08,
+					ease: "back.out",
 					delay: 0.2,
 				},
 			);
@@ -79,24 +151,63 @@ const Navbar = () => {
 			gsap.fromTo(
 				contactBtnRef.current,
 				{ opacity: 0, y: 20 },
-				{ opacity: 1, y: 0, duration: 0.4, delay: 0.6, ease: "power2.out" },
+				{
+					opacity: 1,
+					y: 0,
+					duration: 0.3,
+					delay: 0.5,
+					ease: "back.out",
+				},
 			);
 
 			// Animate arrow
 			gsap.fromTo(
 				arrowRef.current,
 				{ x: -10, opacity: 0 },
-				{ x: 0, opacity: 1, duration: 0.4, delay: 0.7, ease: "back.out" },
+				{
+					x: 0,
+					opacity: 1,
+					duration: 0.3,
+					delay: 0.6,
+					ease: "back.out",
+				},
 			);
 		}
+
+		return () => {
+			if (animationRef.current) {
+				animationRef.current.kill();
+			}
+		};
+	}, [menuOpen, isClosing]);
+
+	// Close menu when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event) => {
+			if (
+				menuOpen &&
+				navbarRef.current &&
+				!navbarRef.current.contains(event.target)
+			) {
+				closeMenu();
+			}
+		};
+
+		if (menuOpen) {
+			document.addEventListener("mousedown", handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
 	}, [menuOpen]);
 
 	return (
 		<>
-			{/* Main Navbar Container - Max width 400px */}
+			{/* Main Navbar Container - Responsive width */}
 			<div
 				ref={navbarRef}
-				className={`fixed top-0 right-0 z-40 transition-transform duration-300 xss:w-full max-w-[400px] w-full ${
+				className={`fixed top-0 right-0 z-40 transition-transform duration-300 ease-out w-full max-w-[400px] sm:max-w-[400px] ${
 					isVisible ? "translate-y-0" : "-translate-y-full"
 				}`}
 				style={{
@@ -114,7 +225,7 @@ const Navbar = () => {
 					}}
 				/>
 
-				{/* Main navbar container with slightly smaller dimensions to show the border */}
+				{/* Main navbar container */}
 				<header
 					className="relative w-full bg-white text-black shadow-lg"
 					style={{
@@ -124,11 +235,8 @@ const Navbar = () => {
 					}}
 				>
 					<div className="flex items-center border-b border-gray-800">
-						{/* Logo section - 300px width */}
-						<div
-							className="flex items-center p-2 w-3/4"
-							style={{ maxWidth: "300px" }}
-						>
+						{/* Logo section */}
+						<div className="flex items-center p-2 w-3/4 sm:w-3/4">
 							<div className="mr-2">
 								<Image
 									src="/svg/logo.svg"
@@ -140,18 +248,22 @@ const Navbar = () => {
 							</div>
 						</div>
 
-						{/* Menu toggle button container - 100px width and height (square) */}
+						{/* Menu toggle button container */}
 						<div
-							className="relative border-l border-l-gray-800 border-dashed w-1/4"
+							className="relative border-l border-l-gray-800 border-dashed w-1/4 sm:w-1/4 cursor-pointer group"
 							style={{
 								maxWidth: "100px",
 								aspectRatio: "1 / 1",
 							}}
+							onClick={toggleMenu}
+							role="button"
+							aria-label="Toggle menu"
+							aria-expanded={menuOpen}
 						>
 							<button
 								onClick={toggleMenu}
 								aria-label="Toggle menu"
-								className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none"
+								className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 focus:outline-none w-full h-full flex items-center justify-center group-hover:bg-gray-100 transition-colors duration-200"
 							>
 								{menuOpen ? (
 									<svg
@@ -183,69 +295,72 @@ const Navbar = () => {
 					</div>
 
 					{/* Menu dropdown */}
-					{menuOpen && (
-						<div ref={menuRef} className="overflow-hidden bg-white">
-							<nav className="flex flex-col border-b border-gray-800">
-								{navLinks.map((link, index) => (
-									<Link
-										key={link.id}
-										href={link.href}
-										ref={(el) => (menuItemsRef.current[index] = el)}
-										className="flex items-center justify-between py-3 px-3 border-b border-gray-800 last:border-b-0 hover:bg-[var(--primary-color)] transition-colors duration-300"
-									>
-										<div className="flex items-center">
-											<span className="text-xs font-medium mr-3">
-												{link.id}
-											</span>
-											<span className="text-sm font-normal">{link.label}</span>
-										</div>
-										{link.id === "01" && <span className="text-sm">+</span>}
-									</Link>
-								))}
-							</nav>
+					<div
+						ref={menuRef}
+						className="overflow-hidden bg-white"
+						style={{ display: menuOpen ? "block" : "none" }}
+					>
+						<nav className="flex flex-col border-b border-gray-800">
+							{navLinks.map((link, index) => (
+								<Link
+									key={link.id}
+									href={link.href}
+									ref={(el) => (menuItemsRef.current[index] = el)}
+									className={`flex items-center justify-between py-3 px-3 border-b border-gray-800 last:border-b-0 hover:bg-[var(--primary-color)] transition-colors duration-200 ${
+										pathname === link.href ? "bg-gray-100" : ""
+									}`}
+									onClick={closeMenu}
+								>
+									<div className="flex items-center">
+										<span className="text-xs font-medium mr-3">{link.id}</span>
+										<span className="text-sm font-normal">{link.label}</span>
+									</div>
+									{link.id === "01" && <span className="text-sm">+</span>}
+								</Link>
+							))}
+						</nav>
 
-							{/* Contact section */}
-							<div
-								ref={contactBtnRef}
-								className="flex bg-[var(--secondary-color)] text-white"
-							>
-								<div className="py-3 px-3 flex-1">
-									<span className="text-xs uppercase font-medium">CONTACT</span>
-									<span className="text-xs uppercase font-medium ml-1">US</span>
-									<h2 className="text-sm font-medium mt-2">LET'S TALK</h2>
-									<div className="flex items-center mt-3">
-										<span className="mr-3">/</span>
-										<span>F034671</span>
-									</div>
+						{/* Contact section */}
+						<div
+							ref={contactBtnRef}
+							className="flex bg-[var(--secondary-color)] text-white hover:bg-[var(--secondary-color-dark)] transition-colors duration-200"
+						>
+							<div className="py-3 px-3 flex-1">
+								<span className="text-xs uppercase font-medium">CONTACT</span>
+								<span className="text-xs uppercase font-medium ml-1">US</span>
+								<h2 className="text-sm font-medium mt-2">LET'S TALK</h2>
+								<div className="flex items-center mt-3">
+									<span className="mr-3">/</span>
+									<span>F034671</span>
 								</div>
-								<div className="flex items-center justify-center px-3 border-l border-black">
-									<div ref={arrowRef} className="transform">
-										<svg
-											width="18"
-											height="18"
-											viewBox="0 0 24 24"
-											fill="none"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												d="M5 12H19M19 12L12 5M19 12L12 19"
-												stroke="currentColor"
-												strokeWidth="2"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											/>
-										</svg>
-									</div>
+							</div>
+							<div className="flex items-center justify-center px-3 border-l border-black hover:bg-black/10 transition-colors duration-200">
+								<div ref={arrowRef} className="transform">
+									<svg
+										width="18"
+										height="18"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M5 12H19M19 12L12 5M19 12L12 19"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+									</svg>
 								</div>
 							</div>
 						</div>
-					)}
+					</div>
 				</header>
 			</div>
 
 			{/* Dark mode toggle positioned at bottom right */}
 			<div className="fixed bottom-4 right-4 z-50">
-				<div className="bg-white dark:bg-gray-800 rounded-full h-[34px] ">
+				<div className="bg-white dark:bg-gray-800 rounded-full h-[34px] shadow-md hover:shadow-lg transition-shadow duration-200">
 					<DarkModeToggle />
 				</div>
 			</div>

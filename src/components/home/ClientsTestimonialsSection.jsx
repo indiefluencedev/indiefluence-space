@@ -1,7 +1,9 @@
-// ClientTestimonials.js
+"use client";
+
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import HeadingComponent from "../UI/HeadingComponent";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,165 +15,369 @@ const testimonials = [
 		author: "Sarah Johnson",
 		position: "CEO, InnovateTech",
 		company: "InnovateTech",
-		image: "/api/placeholder/120/120",
+		client: "/png/testimonials/testImage.png",
+		image: "/png/testimonials/imageProject.png",
 	},
 	{
 		id: "t002",
-		quote:
-			"The system architecture they designed has scaled flawlessly...",
+		quote: "The system architecture they designed has scaled flawlessly...",
 		author: "Michael Chen",
 		position: "CTO, ScaleUp Solutions",
 		company: "ScaleUp Solutions",
-		image: "/api/placeholder/120/120",
+		client: "/png/testimonials/testImage.png",
+		image: "/png/testimonials/imageProject.png",
 	},
 	{
 		id: "t003",
-		quote:
-			"Their backend development team delivered a solution...",
+		quote: "Their backend development team delivered a solution...",
 		author: "Elena Rodriguez",
 		position: "VP of Engineering, DataFlow",
 		company: "DataFlow",
-		image: "/api/placeholder/120/120",
+		client: "/png/testimonials/testImage.png",
+		image: "/png/testimonials/imageProject.png",
 	},
 	{
 		id: "t004",
-		quote:
-			"Our user engagement metrics doubled after implementing...",
+		quote: "Our user engagement metrics doubled after implementing...",
 		author: "James Wilson",
 		position: "Product Director, UserFirst",
 		company: "UserFirst",
-		image: "/api/placeholder/120/120",
+		client: "/png/testimonials/testImage.png",
+		image: "/png/testimonials/imageProject.png",
 	},
 	{
 		id: "t005",
-		quote:
-			"Their DevOps implementation reduced our deployment time...",
+		quote: "Their DevOps implementation reduced our deployment time...",
 		author: "Aisha Patel",
 		position: "Lead Developer, CloudNative",
 		company: "CloudNative",
-		image: "/api/placeholder/120/120",
+		client: "/png/testimonials/testImage.png",
+		image: "/png/testimonials/imageProject.png",
 	},
 ];
 
 export default function ClientTestimonials() {
-	const testimonialsRef = useRef(null);
-	const testimonialsContainerRef = useRef(null);
+	const sectionRef = useRef(null);
+	const cardsContainerRef = useRef(null);
+	const progressRef = useRef([]);
 	const testimonialElementsRef = useRef([]);
 
+	// Reverse the testimonials array to display in descending order
+	const reversedTestimonials = [...testimonials].reverse();
+
 	useEffect(() => {
-		const section = testimonialsRef.current;
-		const container = testimonialsContainerRef.current;
+		const section = sectionRef.current;
+		const cardsContainer = cardsContainerRef.current;
 
-		if (!section || !container) return;
+		if (!section || !cardsContainer) return;
 
+		// Calculate total scrollable width
 		const totalWidth = testimonials.length * 100;
-		gsap.set(container, { width: `${totalWidth}%` });
 
-		const horizontalScroll = gsap.timeline({
-			scrollTrigger: {
-				trigger: section,
-				start: "top top",
-				end: `+=${totalWidth}%`,
-				pin: true,
-				scrub: 1,
-				anticipatePin: 1,
-				invalidateOnRefresh: true,
-			},
+		// Set container width
+		gsap.set(cardsContainer, {
+			width: `${totalWidth}%`,
+			x: -(cardsContainer.scrollWidth - window.innerWidth), // Start at end (to show the last card first)
 		});
 
-		horizontalScroll.fromTo(
-			container,
-			{ x: () => -(container.scrollWidth - window.innerWidth) },
-			{ x: 0, ease: "none" }
+		// Calculate dynamic height based on viewport
+		const setDynamicHeight = () => {
+			// Set minimum height but also adapt to viewport height
+			const viewportHeight = window.innerHeight;
+			const minHeight = 600; // Minimum height for the section
+			const idealHeight = Math.max(minHeight, viewportHeight * 0.85); // 85% of viewport height
+			section.style.height = `${idealHeight}px`;
+		};
+
+		// Set initial height
+		setDynamicHeight();
+
+		// Create smooth horizontal scroll from left to right
+		const scrollMultiplier = 5; // Slows down the scroll by 5x - matching services section
+		const scrollTween = gsap.fromTo(
+			cardsContainer,
+			{ x: -(cardsContainer.scrollWidth - window.innerWidth) }, // Start from the end
+			{
+				x: 0, // Move to the beginning (right to left)
+				ease: "none",
+				scrollTrigger: {
+					trigger: section,
+					start: "top top",
+					// Multiplying the end value makes the scroll slower
+					end: () =>
+						`+=${(cardsContainer.scrollWidth - window.innerWidth) * scrollMultiplier}`,
+					pin: true,
+					scrub: 2, // Smoother, slower scrolling - matching services section
+					anticipatePin: 1,
+					invalidateOnRefresh: true,
+					onUpdate: (self) => {
+						// Invert the progress calculation for reversed order
+						const progress = Math.floor(
+							(1 - self.progress) * testimonials.length,
+						);
+						progressRef.current.forEach((dot, i) => {
+							if (dot) {
+								dot.setAttribute(
+									"data-current",
+									i === progress ? "true" : "false",
+								);
+							}
+						});
+					},
+				},
+			},
 		);
 
+		// Animate individual testimonial cards as they come into view
 		testimonialElementsRef.current.forEach((el, index) => {
+			if (!el) return;
+
 			gsap.fromTo(
 				el,
-				{ x: 100, opacity: 0 },
+				{ x: 50, opacity: 0.7 }, // Changed from -50 to 50 to enter from right
 				{
 					x: 0,
 					opacity: 1,
-					duration: 1,
 					scrollTrigger: {
 						trigger: el,
-						containerAnimation: horizontalScroll,
-						start: "right left",
-						end: "right center",
+						containerAnimation: scrollTween,
+						start: "right left", // Changed from "left right" to "right left"
+						end: "right center", // Changed from "left center" to "right center"
 						scrub: true,
 					},
-				}
+				},
 			);
+
+			// Animate quote and content
+			const quote = el.querySelector(".quote-mark");
+			const testimonialText = el.querySelector(".testimonial-text");
+			const authorInfo = el.querySelector(".author-info");
+			const cta = el.querySelector(".cta-button");
+
+			if (quote) {
+				gsap.fromTo(
+					quote,
+					{ y: 30, opacity: 0 },
+					{
+						y: 0,
+						opacity: 1,
+						scrollTrigger: {
+							trigger: el,
+							containerAnimation: scrollTween,
+							start: "right left-=100", // Changed direction
+							end: "right center",
+							scrub: true,
+						},
+					},
+				);
+			}
+
+			if (testimonialText) {
+				gsap.fromTo(
+					testimonialText,
+					{ y: 20, opacity: 0 },
+					{
+						y: 0,
+						opacity: 1,
+						scrollTrigger: {
+							trigger: el,
+							containerAnimation: scrollTween,
+							start: "right left-=100", // Changed direction
+							end: "right center",
+							scrub: true,
+						},
+					},
+				);
+			}
+
+			if (authorInfo) {
+				gsap.fromTo(
+					authorInfo,
+					{ y: 20, opacity: 0 },
+					{
+						y: 0,
+						opacity: 1,
+						delay: 0.1,
+						scrollTrigger: {
+							trigger: el,
+							containerAnimation: scrollTween,
+							start: "right left-=150", // Changed direction
+							end: "right center",
+							scrub: true,
+						},
+					},
+				);
+			}
+
+			if (cta) {
+				gsap.fromTo(
+					cta,
+					{ y: 20, opacity: 0 },
+					{
+						y: 0,
+						opacity: 1,
+						delay: 0.2,
+						scrollTrigger: {
+							trigger: el,
+							containerAnimation: scrollTween,
+							start: "right left-=200", // Changed direction
+							end: "right center",
+							scrub: true,
+						},
+					},
+				);
+			}
 		});
+
+		// Handle resize events
+		const handleResize = () => {
+			setDynamicHeight();
+			ScrollTrigger.refresh();
+		};
+
+		window.addEventListener("resize", handleResize);
 
 		return () => {
 			ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+			window.removeEventListener("resize", handleResize);
 		};
 	}, []);
 
 	return (
-		<section ref={testimonialsRef} className="w-full h-screen overflow-hidden relative">
-			<div ref={testimonialsContainerRef} className="absolute top-0 left-0 h-full flex">
-				{testimonials.map((testimonial, index) => (
-					<div
-						key={testimonial.id}
-						ref={(el) => (testimonialElementsRef.current[index] = el)}
-						className="w-screen h-full flex items-center px-8 md:px-16 border-b border-gray-200 [data-dark-mode='true']:border-gray-800"
-					>
-						<div className="w-full h-full flex flex-col md:flex-row items-center">
-							{/* Image section */}
-							<div className="w-full md:w-1/2 h-3/4 bg-gray-100 [data-dark-mode='true']:bg-gray-800 flex items-center justify-center">
-								<div className="relative w-3/4 h-3/4">
-									<img
-										src="/api/placeholder/800/600"
-										alt={`${testimonial.company} project`}
-										className="w-full h-full object-cover"
-									/>
-									<div className="absolute -bottom-4 -right-4 bg-white [data-dark-mode='true']:bg-gray-900 p-4 shadow-lg">
-										<img
-											src={testimonial.image}
-											alt={testimonial.company}
-											className="w-24 h-12 object-contain"
-										/>
-									</div>
-								</div>
-							</div>
+		<>
+			{/* Main container to eliminate unwanted spacing */}
+			<div className="w-full relative">
+				{/* Heading Section with responsive spacing */}
+				<div className="pt-8 md:pt-12 lg:pt-16">
+					<HeadingComponent
+						sectionLabel="TESTIMONIALS"
+						title={
+							<>
+								What our clients
+								<br />
+								have to say
+							</>
+						}
+						sectionNumber="006"
+					/>
+				</div>
 
-							{/* Text content section */}
-							<div className="w-full md:w-1/2 h-full flex flex-col justify-center pl-8">
-								<div className="flex items-center">
-									<span className="text-sm font-mono opacity-50 mb-2">T/{testimonial.id}</span>
-								</div>
-								<div className="text-4xl md:text-5xl font-serif mb-8">"</div>
-								<p className="text-lg md:text-2xl max-w-xl mb-12 font-serif italic">{testimonial.quote}</p>
-								<div className="flex items-center">
-									<div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-										<img src={testimonial.image} alt={testimonial.author} className="w-full h-full object-cover" />
+				{/* Horizontal Scrolling Testimonials Section */}
+				<section
+					ref={sectionRef}
+					className="w-full min-h-[600px] overflow-hidden relative"
+				>
+					<div
+						ref={cardsContainerRef}
+						className="absolute top-0 left-0 h-full flex will-change-transform"
+					>
+						{/* Using the reversed array for display */}
+						{reversedTestimonials.map((testimonial, index) => (
+							<div
+								key={testimonial.id}
+								ref={(el) => (testimonialElementsRef.current[index] = el)}
+								className="w-screen h-full flex items-center px-4 sm:px-8 md:px-12 lg:px-16 xl:px-24 border-b border-gray-200 dark:border-gray-800"
+							>
+								{/* Card container */}
+								<div className="relative w-full h-full lg:w-full mx-auto">
+									{/* Content wrapper */}
+									<div className="relative w-full h-full flex flex-col md:flex-row items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 z-10">
+										{/* Image Container - Left side */}
+										<div className="w-full md:w-1/2 flex items-center justify-center mb-10 md:mb-0">
+											<div className="w-[90%] aspect-square max-w-md lg:max-w-none lg:w-[85%]">
+												<div className="relative w-full h-full shadow-2xl">
+													<img
+														src={testimonial.image}
+														alt={`${testimonial.company} project`}
+														className="w-full h-full object-cover rounded-lg"
+													/>
+													<div className="absolute -bottom-4 -right-4 bg-white dark:bg-gray-900 p-4 shadow-lg rounded-md">
+														<img
+															src={testimonial.client}
+															alt={testimonial.company}
+															className="w-24 h-12 object-contain"
+														/>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										{/* Content side - Right side */}
+										<div className="w-full md:w-1/2 flex flex-col justify-center pl-0 md:pl-8 lg:pl-16 mb-8 md:mb-0 mt-6 md:mt-0">
+											<div className="flex items-center">
+												<span className="text-sm font-mono opacity-70 mb-2">
+													T/{testimonial.id}
+												</span>
+											</div>
+											<div className="text-5xl md:text-6xl font-serif mb-6 quote-mark">
+												"
+											</div>
+											<p className="text-default text-lg md:text-2xl lg:text-3xl max-w-xl lg:max-w-2xl mb-6 sm:mb-8 font-serif italic testimonial-text">
+												{testimonial.quote}
+											</p>
+											<div className="flex items-center mt-4 author-info">
+												<div className="w-12 h-12 rounded-full overflow-hidden mr-4 shadow-lg">
+													<img
+														src={testimonial.image}
+														alt={testimonial.author}
+														className="w-full h-full object-cover"
+													/>
+												</div>
+												<div>
+													<h4 className="font-bold text-lg">
+														{testimonial.author}
+													</h4>
+													<p className="text-sm opacity-70">
+														{testimonial.position}, {testimonial.company}
+													</p>
+												</div>
+											</div>
+											<button className="mt-12 border border-black dark:border-white text-black dark:text-white px-8 py-3 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all w-fit flex items-center group cta-button rounded-md">
+												<span>READ CASE STUDY</span>
+												<svg
+													className="ml-4 w-4 h-4 group-hover:translate-x-1 transition-transform"
+													viewBox="0 0 24 24"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M13 5L20 12L13 19"
+														stroke="currentColor"
+														strokeWidth="2"
+														strokeLinecap="round"
+														strokeLinejoin="round"
+													/>
+													<path
+														d="M3 12H20"
+														stroke="currentColor"
+														strokeWidth="2"
+														strokeLinecap="round"
+														strokeLinejoin="round"
+													/>
+												</svg>
+											</button>
+										</div>
 									</div>
-									<div>
-										<h4 className="font-bold">{testimonial.author}</h4>
-										<p className="text-sm opacity-70">
-											{testimonial.position}, {testimonial.company}
-										</p>
-									</div>
 								</div>
-								<button className="mt-12 border border-black [data-dark-mode='true']:border-white text-black [data-dark-mode='true']:text-white px-8 py-3 hover:bg-black hover:text-white [data-dark-mode='true']:hover:bg-white [data-dark-mode='true']:hover:text-black transition-all w-fit flex items-center group">
-									<span>READ CASE STUDY</span>
-									<svg
-										className="ml-4 w-4 h-4 group-hover:translate-x-1 transition-transform"
-										viewBox="0 0 24 24"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path d="M13 5L20 12L13 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-										<path d="M3 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-									</svg>
-								</button>
 							</div>
-						</div>
+						))}
 					</div>
-				))}
+
+					{/* Progress indicator dots */}
+					<div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-0 w-full flex justify-center gap-3 z-10">
+						{testimonials.map((_, index) => (
+							<div
+								key={index}
+								ref={(el) => (progressRef.current[index] = el)}
+								className="w-3 h-3 rounded-full bg-gray-400 opacity-30 data-[current='true']:opacity-100 data-[current='true']:bg-gray-800 dark:data-[current='true']:bg-gray-200 transition-all duration-300"
+								data-current={
+									index === testimonials.length - 1 ? "true" : "false"
+								}
+							></div>
+						))}
+					</div>
+				</section>
 			</div>
-		</section>
+		</>
 	);
 }

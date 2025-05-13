@@ -131,16 +131,19 @@ const SpinDialText = ({ text, isHovering, duration = 0.5 }) => {
 
 const splitText = (text, className = "") =>
 	text.split("").map((char, i) => (
-		<span key={i} className={`${className} inline-block`}>
+		<span key={i} className={`${className} inline-block text-current`}>
 			{char === " " ? "\u00A0" : char}
 		</span>
 	));
 
 const SharedHeading = () => {
-	const fromRef = useRef([]);
+	// Create refs for text animations
+	const fromRef = useRef(null);
 	const ideasSpan = useRef(null);
-	const toRef = useRef([]);
+	const toRef = useRef(null);
 	const impactSpan = useRef(null);
+
+	// State management
 	const [buttonHover, setButtonHover] = useState(false);
 	const [ideasVisible, setIdeasVisible] = useState(false);
 	const [impactVisible, setImpactVisible] = useState(false);
@@ -151,9 +154,11 @@ const SharedHeading = () => {
 	const textBlackRef = useRef(null);
 	const underlineRef = useRef(null);
 
-	// Check for dark mode on mount and when theme changes
+	// Store animation timelines
+	const mainTl = useRef(null);
+
+	// Check for dark mode
 	useEffect(() => {
-		// Check if we're in dark mode on component mount
 		const checkDarkMode = () => {
 			const isDark =
 				document.documentElement.getAttribute("data-dark-mode") === "true";
@@ -181,21 +186,40 @@ const SharedHeading = () => {
 		return () => observer.disconnect();
 	}, []);
 
-	// Animate on mount
+	// Animate on mount with proper cleanup
 	useEffect(() => {
-		const timeline = gsap.timeline();
+		// Kill any existing animations on component mount
+		if (mainTl.current) {
+			mainTl.current.kill();
+		}
 
-		// "From"
-		timeline.from(fromRef.current, {
-			y: 80,
-			opacity: 0,
-			stagger: 0.04,
-			duration: 1,
-			ease: "power3.out",
-		});
+		// Reset visibility state
+		setIdeasVisible(false);
+		setImpactVisible(false);
+
+		// Create a new timeline
+		mainTl.current = gsap.timeline();
+
+		// "From" text animation
+		mainTl.current.fromTo(
+			fromRef.current.children,
+			{
+				y: 80,
+				opacity: 0,
+				color: "currentColor", // Explicitly set color
+			},
+			{
+				y: 0,
+				opacity: 1,
+				color: "currentColor", // Ensure text color is inherited
+				stagger: 0.04,
+				duration: 1,
+				ease: "power3.out",
+			},
+		);
 
 		// Scramble animation for "IDEAS"
-		timeline.fromTo(
+		mainTl.current.fromTo(
 			ideasSpan.current,
 			{ text: "....." },
 			{
@@ -208,20 +232,26 @@ const SharedHeading = () => {
 			"-=0.6",
 		);
 
-		// "TO"
-		timeline.from(
-			toRef.current,
+		// "TO" animation
+		mainTl.current.fromTo(
+			toRef.current.children,
 			{
 				y: 50,
 				opacity: 0,
+				color: "currentColor", // Explicitly set color
+			},
+			{
+				y: 0,
+				opacity: 1,
+				color: "currentColor", // Ensure text color is inherited
 				stagger: 0.1,
 				duration: 0.8,
 			},
 			"-=0.5",
 		);
 
-		// Scramble animation for "IMPACT" (same as IDEAS)
-		timeline.fromTo(
+		// Scramble animation for "IMPACT"
+		mainTl.current.fromTo(
 			impactSpan.current,
 			{ text: "......" },
 			{
@@ -232,6 +262,13 @@ const SharedHeading = () => {
 			},
 			"-=0.6",
 		);
+
+		// Cleanup function
+		return () => {
+			if (mainTl.current) {
+				mainTl.current.kill();
+			}
+		};
 	}, []);
 
 	// Button hover animations
@@ -255,21 +292,15 @@ const SharedHeading = () => {
 		}
 	}, [buttonHover]);
 
-	// Utility to collect refs for span arrays
-	const attachRefs = (arr, refArray) => (el) => {
-		if (el && !refArray.current.includes(el)) refArray.current.push(el);
-	};
-
 	return (
 		<div className="flex flex-col w-full py-2 sm:py-4 md:py-8 lg:pt-0 lg:pb-20 px-1 sm:px-2 md:px-4 lg:px-8">
 			{/* Main slogan */}
 			<div className="text-left mb-2 sm:mb-4 md:mb-8 lg:mb-10 font-bold tracking-tight leading-none">
-				<div className="text-[2rem] xss:text-[2.5rem] xs:text-[3rem] sm:text-[3.5rem] md:text-[4rem] lg:text-[5rem] xl:text-[6rem] 2xl:text-[7rem]">
-					{splitText("From", "").map((el, i) =>
-						React.cloneElement(el, {
-							ref: attachRefs(el, fromRef),
-						}),
-					)}
+				<div
+					ref={fromRef}
+					className="text-[2rem] xss:text-[2.5rem] xs:text-[3rem] sm:text-[3.5rem] md:text-[4rem] lg:text-[5rem] xl:text-[6rem] 2xl:text-[7rem] text-current"
+				>
+					{splitText("From", "")}
 				</div>
 
 				{/* "IDEAS" with scramble effect and hover */}
@@ -288,12 +319,11 @@ const SharedHeading = () => {
 					)}
 				</div>
 
-				<div className="text-[1.5rem] xss:text-[1.8rem] xs:text-[2rem] sm:text-[2.5rem] md:text-[3rem] lg:text-[3.5rem] xl:text-[4rem] 2xl:text-[5rem] mt-1 xs:mt-1.5 sm:mt-2 md:mt-3">
-					{splitText("TO").map((el, i) =>
-						React.cloneElement(el, {
-							ref: attachRefs(el, toRef),
-						}),
-					)}
+				<div
+					ref={toRef}
+					className="text-[1.5rem] xss:text-[1.8rem] xs:text-[2rem] sm:text-[2.5rem] md:text-[3rem] lg:text-[3.5rem] xl:text-[4rem] 2xl:text-[5rem] mt-1 xs:mt-1.5 sm:mt-2 md:mt-3 text-current"
+				>
+					{splitText("TO", "")}
 				</div>
 
 				{/* "IMPACT" with scramble effect and hover */}
@@ -330,20 +360,9 @@ const SharedHeading = () => {
 				<div className="justify-end flex items-center">
 					<QuantumButton
 						text="EXPLORE"
-						className="mt-4 xs:mt-5 sm:mt-6 md:mt-4 "
-						onClick={() => router.push("/explore")}
+						className="mt-4 xs:mt-5 sm:mt-6 md:mt-4"
 					/>
 				</div>
-				{/* <ButtonControls /> */}
-				{/* <CosmicPulseButton /> */}
-				{/* <WarpDriveButton /> */}
-				{/* <ConstellationButton /> */}
-				{/* <QuantumButton /> */}
-				{/* <WormholeButton /> */}
-				{/* <QuantumButton  /> */}
-				{/* <MeteorButton /> */}
-
-				{/* Button with hover effect */}
 			</div>
 		</div>
 	);
