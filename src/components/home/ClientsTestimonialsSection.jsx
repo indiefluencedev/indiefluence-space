@@ -74,10 +74,13 @@ export default function ClientTestimonials() {
 		// Calculate total scrollable width
 		const totalWidth = testimonials.length * 100;
 
-		// Set container width
+		// Calculate the offset needed to show the last card first (index 0 of reversedTestimonials)
+		const initialOffset = window.innerWidth * (testimonials.length - 1);
+
+		// Set container width and initial position
 		gsap.set(cardsContainer, {
 			width: `${totalWidth}%`,
-			x: -(cardsContainer.scrollWidth - window.innerWidth), // Start at end (to show the last card first)
+			x: -initialOffset, // Position to show the last testimonial first
 		});
 
 		// Calculate dynamic height based on viewport
@@ -92,11 +95,11 @@ export default function ClientTestimonials() {
 		// Set initial height
 		setDynamicHeight();
 
-		// Create smooth horizontal scroll from left to right
-		const scrollMultiplier = 5; // Slows down the scroll by 5x - matching services section
+		// Create smooth horizontal scroll from right to left
+		const scrollMultiplier = 2; // Slows down the scroll by 5x - matching services section
 		const scrollTween = gsap.fromTo(
 			cardsContainer,
-			{ x: -(cardsContainer.scrollWidth - window.innerWidth) }, // Start from the end
+			{ x: -initialOffset }, // Start from the position showing the last testimonial
 			{
 				x: 0, // Move to the beginning (right to left)
 				ease: "none",
@@ -104,14 +107,13 @@ export default function ClientTestimonials() {
 					trigger: section,
 					start: "top top",
 					// Multiplying the end value makes the scroll slower
-					end: () =>
-						`+=${(cardsContainer.scrollWidth - window.innerWidth) * scrollMultiplier}`,
+					end: () => `+=${initialOffset * scrollMultiplier}`,
 					pin: true,
 					scrub: 2, // Smoother, slower scrolling - matching services section
 					anticipatePin: 1,
 					invalidateOnRefresh: true,
 					onUpdate: (self) => {
-						// Invert the progress calculation for reversed order
+						// Calculate which testimonial is currently visible
 						const progress = Math.floor(
 							(1 - self.progress) * testimonials.length,
 						);
@@ -229,9 +231,28 @@ export default function ClientTestimonials() {
 			}
 		});
 
+		// Immediately highlight the correct progress indicator
+		progressRef.current.forEach((dot, i) => {
+			if (dot) {
+				dot.setAttribute(
+					"data-current",
+					i === testimonials.length - 1 ? "true" : "false",
+				);
+			}
+		});
+
 		// Handle resize events
 		const handleResize = () => {
 			setDynamicHeight();
+
+			// Recalculate the offset on resize
+			const newInitialOffset = window.innerWidth * (testimonials.length - 1);
+
+			// Reset container position after resize
+			if (!ScrollTrigger.getById("testimonialScroll")) {
+				gsap.set(cardsContainer, { x: -newInitialOffset });
+			}
+
 			ScrollTrigger.refresh();
 		};
 
