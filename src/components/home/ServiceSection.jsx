@@ -108,7 +108,7 @@ export default function ServicesSection() {
 		setDynamicHeight();
 
 		// Create smooth horizontal scroll from left to right
-		const scrollMultiplier = 2; // Slows down the scroll by 5x
+		const scrollMultiplier = 1; // Slows down the scroll by 5x
 		const scrollTween = gsap.to(cardsContainer, {
 			x: () => -(cardsContainer.scrollWidth - window.innerWidth),
 			ease: "none",
@@ -231,7 +231,7 @@ export default function ServicesSection() {
 				{/* Horizontal Scrolling Services Section - removed fixed height */}
 				<section
 					ref={sectionRef}
-					className="w-full min-h-[600px] overflow-hidden relative "
+					className="w-full min-h-[700px] overflow-hidden relative "
 				>
 					<div
 						ref={cardsContainerRef}

@@ -1,9 +1,10 @@
 import "./globals.css";
 import { Manrope, Orbitron } from "next/font/google";
 import { ThemeProvider } from "@/context/TheamContext";
-import Navbar from "@/components/navbar/Navbar";
+// import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
 import BackgroundEffects from "@/components/UI/BackgroundEffect";
+import Sidebar from "@/components/navbar/SideNavbar";
 
 const manrope = Manrope({
 	variable: "--font-manrope",
@@ -31,7 +32,8 @@ export default function RootLayout({ children }) {
 				<ThemeProvider>
 					{/* Background Effects added here */}
 					<BackgroundEffects />
-					<Navbar />
+					{/* <Navbar /> */}
+					<Sidebar />
 					<main className="relative z-10">{children}</main>
 					<Footer />
 				</ThemeProvider>
