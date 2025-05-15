@@ -2,29 +2,29 @@ export const services = [
 	{
 		id: "001",
 		slug: "social-media-marketing",
-		title: "Social Media Marketing",
+		title: "Social-Media Marketing",
 		description:
 			"Boost your online presence with strategic content across Instagram, LinkedIn, X, and more—tailored to each platform's strengths to maximize engagement.",
 		image: "/png/services/socialmediea-marketing.png",
 		details: [
 			{
 				heading: "Platform-Specific Strategy",
-				image: "/graphics/smm-strategy.png",
+				image: "/png/services/Artlukas.jpg",
 				description:
 					"We create tailored content strategies for each platform—Instagram Reels, LinkedIn carousels, X threads—to maximize engagement and visibility.",
 			},
 			{
 				heading: "Content Calendar Planning",
-				image: "/graphics/smm-calendar.png",
+				image: "/png/services/download2.jpg",
 				description:
 					"Our detailed content calendars ensure consistent posting, trending hooks, and optimized timing for audience activity.",
 			},
 			{
 				heading: "Analytics & Optimization",
-				image: "/graphics/smm-analytics.png",
+				image: "/png/services/Artlukas.jpg",
 				description:
 					"Regular performance reviews and A/B testing help refine campaigns and boost your reach month over month.",
-			},
+			}
 		],
 	},
 	{
