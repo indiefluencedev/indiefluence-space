@@ -7,8 +7,7 @@ import HeroSection from "@/components/home/HeroSection";
 import StraightSection from "@/components/home/ServiceSection";
 import { QuantumButton } from "@/components/UI/SpinDielButton";
 import ClientsTestimonialsSection from "@/components/home/ClientsTestimonialsSection";
-// import LogoMarquee from "@/components/home/LogoMarquee";
-// import BrandsMarquee from "@/components/home/BrandsMarquee";
+
 import ClientSlider from "@/components/home/ClientSlider";
 // import ServicesSection from "@/components/home/ServicesSection";
 
@@ -258,10 +257,9 @@ export default function Home() {
 			</div>
 			{/* Parallax section slides up from beneath, overlapping HeroSection at the start */}
 			<div className="relative z-10 -mt-32">{renderParallaxSection()}</div>
-			{/* <BrandsMarquee /> */}
-			{/* <ServicesSection/> */}
+	
 			<StraightSection />
-			{/* <LogoMarquee /> */}
+
 			<ClientSlider />
 			<ClientsTestimonialsSection />
 		</div>

@@ -12,66 +12,6 @@ import { services } from "@/data/services"; // Importing service data
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
-// Service data with consistent image paths
-// const services = [
-// 	{
-// 		id: "001",
-// 		title: "Social Media Marketing",
-// 		description:
-// 			"Boost your online presence with strategic content across Instagram, LinkedIn, X, and more—tailored to each platform's strengths to maximize engagement.",
-// 		image: "/png/services/socialmediea-marketing.png",
-// 	},
-// 	{
-// 		id: "002",
-// 		title: "Outbound Marketing",
-// 		description:
-// 			"Engage potential clients through targeted WhatsApp outreach, cold calls, Google & Meta Ads, and high-converting email campaigns.",
-// 		image: "/png/services/Outbound_Marketing_1.png",
-// 	},
-// 	{
-// 		id: "003",
-// 		title: "Content Creation",
-// 		description:
-// 			"From short-form videos to podcasts, voiceovers, and public shoots—our in-house team crafts impactful content across all formats.",
-// 		image: "/png/services/Content_Creation_1.png",
-// 	},
-// 	{
-// 		id: "004",
-// 		title: "Influencer Marketing",
-// 		description:
-// 			"Connect your brand with trusted influencers through campaign planning, editing assistance, and high-ROI collaborations.",
-// 		image: "/png/services/Influencer_Marketing.png",
-// 	},
-// 	{
-// 		id: "005",
-// 		title: "Website Development",
-// 		description:
-// 			"Deliver fast, modern websites with strong SEO, intuitive UI/UX, and optional chatbot integration—backed by robust content and blog writing.",
-// 		image: "/png/services/Website_Development.png",
-// 	},
-// 	{
-// 		id: "006",
-// 		title: "B2B Marketing",
-// 		description:
-// 			"Leverage AI-powered targeting, ICP curation, and lead automation to scale your B2B reach through psychology-driven strategies.",
-// 		image: "/png/services/B2B_Marketing.png",
-// 	},
-// 	{
-// 		id: "007",
-// 		title: "Graphic Designing",
-// 		description:
-// 			"Create scroll-stopping brand visuals—from social posts and brochures to logos, presentations, and office collateral.",
-// 		image: "/png/services/Graphic_Designing.png",
-// 	},
-// 	{
-// 		id: "008",
-// 		title: "Brand Management",
-// 		description:
-// 			"Maintain a cohesive brand identity through digital footprinting, business collaterals, funnel automation, and strategic partnerships.",
-// 		image: "/png/services/Brand_Management.png",
-// 	},
-// ];
-
 export default function ServicesSection() {
 	const { darkMode } = useTheme();
 	const router = useRouter();
@@ -108,7 +48,7 @@ export default function ServicesSection() {
 		setDynamicHeight();
 
 		// Create smooth horizontal scroll from left to right
-		const scrollMultiplier = 2; // Slows down the scroll by 5x
+		const scrollMultiplier = 1; // Slows down the scroll by 5x
 		const scrollTween = gsap.to(cardsContainer, {
 			x: () => -(cardsContainer.scrollWidth - window.innerWidth),
 			ease: "none",
@@ -231,7 +171,7 @@ export default function ServicesSection() {
 				{/* Horizontal Scrolling Services Section - removed fixed height */}
 				<section
 					ref={sectionRef}
-					className="w-full min-h-[600px] overflow-hidden relative "
+					className="w-full min-h-[800px] overflow-hidden relative "
 				>
 					<div
 						ref={cardsContainerRef}
@@ -241,7 +181,7 @@ export default function ServicesSection() {
 							<div
 								key={service.id}
 								ref={(el) => (serviceElementsRef.current[index] = el)}
-								className="w-screen h-full flex items-center px-4 sm:px-8 md:px-12 lg:px-16 xl:px-24 border-b border-gray-200 dark:border-gray-800"
+								className="w-screen h-full flex items-center px-4 sm:px-8 md:px-12 lg:px-16 xl:px-24 border-b border-gray-200 dark:border-gray-800 pt-6  md:pt-8 lg:pt-10 xl:pt-12"
 							>
 								{/* Card container - Only constrained on smaller screens, full width on large screens */}
 								<div className="relative w-full h-full lg:w-full mx-auto">
@@ -262,15 +202,15 @@ export default function ServicesSection() {
 											</p>
 											<QuantumButton
 												text="EXPLORE"
-												className="mt-2 sm:mt-4 w-full sm:w-auto"
+												className="mt-2  w-full sm:w-auto"
 												onClick={() => router.push(`/services/${service.slug}`)}
 											/>
 										</div>
 
 										{/* Image Container - Allowed to be larger on big screens */}
-										<div className="w-full md:w-1/2 flex items-center justify-center mt-4 md:mt-0">
+										<div className="w-full md:w-1/2 flex items-center justify-center  md:mt-0">
 											<div className="w-full aspect-square max-w-md lg:max-w-none lg:w-full">
-												<div className="w-full h-full p-2 sm:p-4 lg:p-0 xl:p-2 flex items-center justify-center">
+												<div className="w-full h-full p-2 lg:p-0 xl:p-2 flex items-center justify-center">
 													<img
 														src={service.image}
 														alt={service.title}

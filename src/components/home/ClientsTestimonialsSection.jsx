@@ -96,7 +96,7 @@ export default function ClientTestimonials() {
 		setDynamicHeight();
 
 		// Create smooth horizontal scroll from right to left
-		const scrollMultiplier = 2; // Slows down the scroll by 5x - matching services section
+		const scrollMultiplier = 1; // Slows down the scroll by 5x - matching services section
 		const scrollTween = gsap.fromTo(
 			cardsContainer,
 			{ x: -initialOffset }, // Start from the position showing the last testimonial
@@ -154,7 +154,6 @@ export default function ClientTestimonials() {
 			const quote = el.querySelector(".quote-mark");
 			const testimonialText = el.querySelector(".testimonial-text");
 			const authorInfo = el.querySelector(".author-info");
-			const cta = el.querySelector(".cta-button");
 
 			if (quote) {
 				gsap.fromTo(
@@ -204,25 +203,6 @@ export default function ClientTestimonials() {
 							trigger: el,
 							containerAnimation: scrollTween,
 							start: "right left-=150", // Changed direction
-							end: "right center",
-							scrub: true,
-						},
-					},
-				);
-			}
-
-			if (cta) {
-				gsap.fromTo(
-					cta,
-					{ y: 20, opacity: 0 },
-					{
-						y: 0,
-						opacity: 1,
-						delay: 0.2,
-						scrollTrigger: {
-							trigger: el,
-							containerAnimation: scrollTween,
-							start: "right left-=200", // Changed direction
 							end: "right center",
 							scrub: true,
 						},
@@ -302,9 +282,9 @@ export default function ClientTestimonials() {
 								{/* Card container */}
 								<div className="relative w-full h-full lg:w-full mx-auto">
 									{/* Content wrapper */}
-									<div className="relative w-full h-full flex flex-col md:flex-row items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 z-10">
+									<div className="relative w-full h-full flex flex-col md:flex-row items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8 z-10">
 										{/* Image Container - Left side */}
-										<div className="w-full md:w-1/2 flex items-center justify-center mb-10 md:mb-0">
+										<div className="w-full md:w-1/2 flex items-center justify-center mb-4 md:mb-0">
 											<div className="w-[90%] aspect-square max-w-md lg:max-w-none lg:w-[85%]">
 												<div className="relative w-full h-full shadow-2xl">
 													<img
@@ -312,11 +292,11 @@ export default function ClientTestimonials() {
 														alt={`${testimonial.company} project`}
 														className="w-full h-full object-cover rounded-lg"
 													/>
-													<div className="absolute -bottom-4 -right-4 bg-white dark:bg-gray-900 p-4 shadow-lg rounded-md">
+													<div className="absolute -bottom-4 -right-4 bg-white dark:bg-gray-900 p-2 sm:p-4 shadow-lg rounded-md">
 														<img
 															src={testimonial.client}
 															alt={testimonial.company}
-															className="w-24 h-12 object-contain"
+															className="w-16 sm:w-24 h-8 sm:h-12 object-contain"
 														/>
 													</div>
 												</div>
@@ -324,20 +304,20 @@ export default function ClientTestimonials() {
 										</div>
 
 										{/* Content side - Right side */}
-										<div className="w-full md:w-1/2 flex flex-col justify-center pl-0 md:pl-8 lg:pl-16 mb-8 md:mb-0 mt-6 md:mt-0">
+										<div className="w-full md:w-1/2 flex flex-col justify-center pl-0 md:pl-8 lg:pl-12 mb-2 md:mb-0 mt-2 md:mt-0">
 											<div className="flex items-center">
-												<span className="text-sm font-mono opacity-70 mb-2">
+												<span className="text-xs sm:text-sm font-mono opacity-70 mb-1">
 													T/{testimonial.id}
 												</span>
 											</div>
-											<div className="text-5xl md:text-6xl font-serif mb-6 quote-mark">
+											<div className="text-4xl md:text-5xl lg:text-6xl font-serif mb-2 sm:mb-4 quote-mark">
 												"
 											</div>
-											<p className="text-default text-lg md:text-2xl lg:text-3xl max-w-xl lg:max-w-2xl mb-6 sm:mb-8 font-serif italic testimonial-text">
+											<p className="text-default text-base sm:text-lg md:text-xl lg:text-2xl max-w-xl lg:max-w-2xl mb-3 sm:mb-4 font-serif italic testimonial-text">
 												{testimonial.quote}
 											</p>
-											<div className="flex items-center mt-4 author-info">
-												<div className="w-12 h-12 rounded-full overflow-hidden mr-4 shadow-lg">
+											<div className="flex items-center mt-2 author-info">
+												<div className="w-10 h-10 rounded-full overflow-hidden mr-3 shadow-lg">
 													<img
 														src={testimonial.image}
 														alt={testimonial.author}
@@ -345,38 +325,14 @@ export default function ClientTestimonials() {
 													/>
 												</div>
 												<div>
-													<h4 className="font-bold text-lg">
+													<h4 className="font-bold text-base sm:text-lg">
 														{testimonial.author}
 													</h4>
-													<p className="text-sm opacity-70">
+													<p className="text-xs sm:text-sm opacity-70">
 														{testimonial.position}, {testimonial.company}
 													</p>
 												</div>
 											</div>
-											<button className="mt-12 border border-black dark:border-white text-black dark:text-white px-8 py-3 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all w-fit flex items-center group cta-button rounded-md">
-												<span>READ CASE STUDY</span>
-												<svg
-													className="ml-4 w-4 h-4 group-hover:translate-x-1 transition-transform"
-													viewBox="0 0 24 24"
-													fill="none"
-													xmlns="http://www.w3.org/2000/svg"
-												>
-													<path
-														d="M13 5L20 12L13 19"
-														stroke="currentColor"
-														strokeWidth="2"
-														strokeLinecap="round"
-														strokeLinejoin="round"
-													/>
-													<path
-														d="M3 12H20"
-														stroke="currentColor"
-														strokeWidth="2"
-														strokeLinecap="round"
-														strokeLinejoin="round"
-													/>
-												</svg>
-											</button>
 										</div>
 									</div>
 								</div>

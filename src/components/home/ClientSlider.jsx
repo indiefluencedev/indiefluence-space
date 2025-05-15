@@ -76,20 +76,25 @@ const ClientSlider = () => {
 			const itemsToClone = slider.querySelectorAll(".client-item");
 			const totalWidth = slider.offsetWidth;
 
-			// Create clones and append to slider
+			// Create clones and append to slider to ensure infinite loop
 			itemsToClone.forEach((item) => {
 				const clone = item.cloneNode(true);
 				clone.classList.add("clone");
 				slider.appendChild(clone);
 			});
 
-			// Create GSAP animation for infinite scrolling
+			// Create GSAP animation for infinite scrolling with increased speed
+			// Reduced duration from 25 to 12 seconds for faster movement
 			animation = gsap.to(slider, {
 				x: `-${totalWidth}px`,
-				duration: 25,
+				duration: 12, // Increased speed by reducing duration
 				ease: "linear",
 				repeat: -1,
 				paused: isHovered,
+				onRepeat: () => {
+					// Reset position for true infinite looping
+					gsap.set(slider, { x: 0 });
+				},
 			});
 		};
 
@@ -112,6 +117,9 @@ const ClientSlider = () => {
 	useEffect(() => {
 		const slider = sliderRef.current;
 		if (!slider) return;
+
+		// Get current animation instance
+		const animation = gsap.getById(slider);
 
 		// Pause/play animation based on hover state
 		if (isHovered) {
@@ -234,9 +242,10 @@ const ClientSlider = () => {
 							className="flex items-center gap-8 md:gap-12 lg:gap-16 will-change-transform"
 							style={{ display: "flex", flexWrap: "nowrap" }}
 						>
-							{clients.map((client) => (
+							{/* Double the client items to ensure smoother looping */}
+							{[...clients, ...clients, ...clients].map((client, index) => (
 								<div
-									key={client.id}
+									key={`${client.id}-${index}`}
 									className="client-item shrink-0 h-12 md:h-16 lg:h-20 flex items-center justify-center"
 								>
 									{/* We'll use placeholder divs, but in production you would use actual Image components */}
