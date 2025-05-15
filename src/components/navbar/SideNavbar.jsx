@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import Image from "next/image";
+import DarkModeToggle from "./toggle/DarkModeToggle";
 
 const NavItem = ({ id, label, href, isActive }) => {
 	const itemRef = useRef(null);
@@ -299,6 +300,12 @@ const FullscreenNav = () => {
 							</div>
 						</div>
 					</div>
+				</div>
+			</div>
+
+			<div className="fixed bottom-4 right-4 z-50">
+				<div className="bg-white dark:bg-gray-800 rounded-full h-[34px] shadow-md hover:shadow-lg transition-shadow duration-200">
+					<DarkModeToggle />
 				</div>
 			</div>
 		</>
