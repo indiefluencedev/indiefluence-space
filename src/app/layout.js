@@ -1,10 +1,11 @@
 import "./globals.css";
 import { Manrope, Orbitron } from "next/font/google";
 import { ThemeProvider } from "@/context/TheamContext";
-// import Navbar from "@/components/navbar/Navbar";
+// import Navbar from "@/components/UI/Navbar";
 import Footer from "@/components/footer/Footer";
 import BackgroundEffects from "@/components/UI/BackgroundEffect";
 import Sidebar from "@/components/navbar/SideNavbar";
+import PixelTransition from "@/components/UI/PixelTransition";
 
 const manrope = Manrope({
 	variable: "--font-manrope",
@@ -14,28 +15,29 @@ const manrope = Manrope({
 const orbitron = Orbitron({
 	variable: "--font-Orbitron",
 	subsets: ["latin"],
-	weight: "400", // Share Tech only comes in 400 weight
+	weight: "400",
 });
 
 export const metadata = {
-	title: "Indiefluence",
-	description: "Your trusted technology partner",
+	title: "Indiefluence Space",
+	description: "Indiefluence Space - Your Digital Innovation Partner",
 };
 
 export default function RootLayout({ children }) {
 	return (
-		<html lang="en" className={`${manrope.variable} ${orbitron.variable}`}>
-			<body
-				className="antialiased min-h-screen relative"
-				suppressHydrationWarning={true}
-			>
+		<html
+			lang="en"
+			className={`${manrope.variable} ${orbitron.variable}`}
+			suppressHydrationWarning
+		>
+			<body className="antialiased min-h-screen relative">
 				<ThemeProvider>
-					{/* Background Effects added here */}
-					<BackgroundEffects />
-					{/* <Navbar /> */}
-					<Sidebar />
-					<main className="relative z-10">{children}</main>
-					<Footer />
+					<PixelTransition>
+						<BackgroundEffects />
+						<Sidebar />
+						<main className="relative z-10">{children}</main>
+						<Footer />
+					</PixelTransition>
 				</ThemeProvider>
 			</body>
 		</html>

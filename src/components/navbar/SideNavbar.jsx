@@ -1,11 +1,11 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import Image from "next/image";
 import DarkModeToggle from "@/components/navbar/toggle/DarkModeToggle";
 import { services } from "@/data/services"; // Import services from your data file
+import TransitionLink from "@/components/UI/TransitionLink"; // Added TransitionLink import
 
 /**
  * FULLSCREEN NAVIGATION COMPONENT
@@ -174,7 +174,7 @@ const NavItem = ({
 
 	return (
 		<div className="relative w-full">
-			<Link
+			<TransitionLink
 				href={href}
 				className={`group flex items-center w-full mb-4 relative overflow-visible hover:text-[var(--primary-color)] ${
 					isActive ? "text-[var(--secondary-color)]" : "text-white"
@@ -217,7 +217,7 @@ const NavItem = ({
 						)}
 					</h2>
 				</div>
-			</Link>
+			</TransitionLink>
 			{/* Horizontal line below menu item */}
 			<div
 				ref={lineRef}
@@ -789,7 +789,7 @@ const FullscreenNav = () => {
 														{/* Services List - CUSTOMIZE DROPDOWN FONT SIZE HERE */}
 														{services.map((service) => (
 															<div key={service.id} className="relative">
-																<Link
+																<TransitionLink
 																	href={`/services/${service.slug}`}
 																	className={`flex items-center py-2 text-xl md:text-3xl lg:text-5xl font-bold uppercase tracking-wider transition-colors duration-200 hover:text-[var(--primary-color)] ${
 																		pathname === `/services/${service.slug}`
@@ -804,7 +804,7 @@ const FullscreenNav = () => {
 																	<span className="group-hover:text-[var(--primary-color)]">
 																		{service.title}
 																	</span>
-																</Link>
+																</TransitionLink>
 																{/* Thin line below each service item */}
 																<div className="w-full h-[1px] bg-gradient-to-r from-white/30 to-transparent my-2 transform origin-left scale-x-0 transition-transform duration-300 hover:scale-x-100"></div>
 															</div>
@@ -814,7 +814,7 @@ const FullscreenNav = () => {
 											</div>
 										) : (
 											<div className="relative">
-												<Link
+												<TransitionLink
 													href={item.href}
 													className={`group flex items-center w-full relative overflow-hidden hover:text-[var(--primary-color)] ${
 														isActive
@@ -843,7 +843,7 @@ const FullscreenNav = () => {
 															<span>{item.label}</span>
 														</h2>
 													</div>
-												</Link>
+												</TransitionLink>
 												{/* Horizontal line below menu item */}
 												<div
 													className={`w-full h-[1px] bg-gradient-to-r from-white via-white to-transparent mb-6 ${
@@ -861,7 +861,7 @@ const FullscreenNav = () => {
 
 						{/* SECTION: CTA Button */}
 						<div className="flex justify-center mt-12">
-							<a
+							<TransitionLink
 								href="/contact"
 								className="navbar-cta-animate group flex flex-col items-center text-center leading-tight relative"
 							>
@@ -891,7 +891,7 @@ const FullscreenNav = () => {
 								</span>
 								{/* Horizontal line below CTA */}
 								<div className="w-full h-[1px] bg-gradient-to-r from-[var(--primary-color)] via-[var(--primary-color)] to-transparent mt-4 transform origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></div>
-							</a>
+							</TransitionLink>
 						</div>
 					</div>
 				</div>

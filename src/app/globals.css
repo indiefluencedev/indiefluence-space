@@ -419,3 +419,12 @@ button:not(.hoverable-letter):hover {
 		left: 1000px;
 	}
 }
+
+/* Page Transition Styles */
+.page-transition-container {
+	position: relative;
+	width: 100%;
+	min-height: 100vh;
+	will-change: opacity;
+	overflow: visible;
+}

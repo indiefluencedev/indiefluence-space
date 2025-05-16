@@ -257,7 +257,7 @@ export default function Home() {
 			</div>
 			{/* Parallax section slides up from beneath, overlapping HeroSection at the start */}
 			<div className="relative z-10 -mt-32">{renderParallaxSection()}</div>
-	
+
 			<StraightSection />
 
 			<ClientSlider />
