@@ -24,6 +24,24 @@ export const services = [
 				image: "/png/services/Artlukas.jpg",
 				description:
 					"Regular performance reviews and A/B testing help refine campaigns and boost your reach month over month.",
+			},
+			{
+				heading: "Platform-Specific Strategy",
+				image: "/png/services/Artlukas.jpg",
+				description:
+					"We create tailored content strategies for each platform—Instagram Reels, LinkedIn carousels, X threads—to maximize engagement and visibility.",
+			},
+			{
+				heading: "Content Calendar Planning",
+				image: "/png/services/download2.jpg",
+				description:
+					"Our detailed content calendars ensure consistent posting, trending hooks, and optimized timing for audience activity.",
+			},
+			{
+				heading: "Analytics & Optimization",
+				image: "/png/services/Artlukas.jpg",
+				description:
+					"Regular performance reviews and A/B testing help refine campaigns and boost your reach month over month.",
 			}
 		],
 	},
