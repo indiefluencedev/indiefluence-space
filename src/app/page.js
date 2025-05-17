@@ -8,7 +8,7 @@ import StraightSection from "@/components/home/ServiceSection";
 import { QuantumButton } from "@/components/UI/SpinDielButton";
 import ClientsTestimonialsSection from "@/components/home/ClientsTestimonialsSection";
 
-import ClientSlider from "@/components/home/ClientSlider";
+import ClientSlider from "@/components/reusablesection/ClientSlider";
 // import ServicesSection from "@/components/home/ServicesSection";
 
 // Register GSAP plugin

@@ -359,7 +359,7 @@ const SharedHeading = () => {
 
 				<div className="justify-end flex items-center">
 					<QuantumButton
-						text="EXPLORE"
+						text="LET'S TALK"
 						className="mt-4 xs:mt-5 sm:mt-6 md:mt-4"
 					/>
 				</div>
