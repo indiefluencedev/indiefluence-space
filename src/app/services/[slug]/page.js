@@ -35,6 +35,7 @@ export default function ServiceDetailPage({ params }) {
 	const titleRef = useRef(null);
 	const textContainerRef = useRef(null);
 	const leftTextRefs = useRef([]);
+	const scrollTriggers = useRef([]);
 
 	if (!service) return notFound();
 
@@ -138,119 +139,148 @@ export default function ServiceDetailPage({ params }) {
 			setOpenMobileSections([]);
 		}
 
-    // ✅ Animate first section on load if mobile
-setTimeout(() => {
-	if (!isDesktop && mobileContentRef.current[0]) {
-		animateMobileSection(0, true);
-	}
-}, 100); // slight delay to ensure refs are set
-
-
+		// ✅ Animate first section on load if mobile
+		setTimeout(() => {
+			if (!isDesktop && mobileContentRef.current[0]) {
+				animateMobileSection(0, true);
+			}
+		}, 100); // slight delay to ensure refs are set
 	}, [slug, isDesktop, details]);
 
 	useEffect(() => {
+		if (!isDesktop) return;
+		
+		// Clean up previous scroll triggers
+		if (scrollTriggers.current.length) {
+			scrollTriggers.current.forEach(trigger => trigger.kill());
+			scrollTriggers.current = [];
+		}
+
 		const mm = gsap.matchMedia();
 
 		mm.add("(min-width: 1024px)", () => {
 			gsap.set(textContainerRef.current, {
 				position: "relative",
-				overflow: "hidden",
+				overflow: "visible",
 			});
 
 			leftTextRefs.current.forEach((el, i) => {
+				if (!el) return;
+				
 				const children = el.querySelectorAll("h2, p");
-				gsap.set(children, { opacity: 0, y: -20 });
-
-				gsap.set(el, {
-					opacity: i === 0 ? 1 : 0,
-					position: "absolute",
-					top: 0,
-					left: 0,
-					width: "100%",
-					height: "100%",
-					pointerEvents: "none",
-				});
-
+				
 				if (i === 0) {
+					// Make first description visible always
+					gsap.set(el, {
+						opacity: 1,
+						position: i === 0 ? "relative" : "absolute",
+						top: 0,
+						left: 0,
+						width: "100%",
+						pointerEvents: "auto",
+					});
+					
 					gsap.to(children, {
 						opacity: 1,
 						y: 0,
-						stagger: 1,
 						duration: 1.2,
 						ease: "power2.out",
+					});
+				} else {
+					gsap.set(children, { opacity: 0, y: -20 });
+					gsap.set(el, {
+						opacity: 0,
+						position: "absolute",
+						top: 0,
+						left: 0,
+						width: "100%",
+						pointerEvents: "none",
 					});
 				}
 			});
 
 			let currentIndex = 0;
 
+			// Create better scroll triggers for each section
 			details.forEach((_, i) => {
-				ScrollTrigger.create({
+				const trigger = ScrollTrigger.create({
 					trigger: sectionRefs.current[i],
-					start: "top center",
+					start: "top 40%", // Adjusted to trigger earlier
+					end: "bottom 40%", // Adjusted end position
 					onEnter: () => {
 						if (currentIndex !== i) {
 							const oldChildren =
-								leftTextRefs.current[currentIndex].querySelectorAll("h2, p");
+								leftTextRefs.current[currentIndex]?.querySelectorAll("h2, p");
 							const newChildren =
-								leftTextRefs.current[i].querySelectorAll("h2, p");
+								leftTextRefs.current[i]?.querySelectorAll("h2, p");
+							
+							if (leftTextRefs.current[currentIndex]) {
+								gsap.to(leftTextRefs.current[currentIndex], {
+									opacity: 0,
+									duration: 0.4,
+									ease: "power2.out",
+								});
+							}
+							
+							if (leftTextRefs.current[i] && newChildren) {
+								gsap.set(newChildren, { opacity: 0, y: -20 });
 
-							gsap.to(leftTextRefs.current[currentIndex], {
-								opacity: 0,
-								duration: 0.6,
-								ease: "power2.out",
-							});
-							gsap.set(newChildren, { opacity: 0, y: -200 });
-
-							gsap.to(leftTextRefs.current[i], {
-								opacity: 1,
-								duration: 0.3,
-								onComplete: () => {
-									gsap.to(newChildren, {
-										opacity: 1,
-										y: 0,
-										stagger: 0.15,
-										duration: 1.2,
-										ease: "power4.out",
-									});
-								},
-							});
+								gsap.to(leftTextRefs.current[i], {
+									opacity: 1,
+									duration: 0.3,
+									onComplete: () => {
+										gsap.to(newChildren, {
+											opacity: 1,
+											y: 0,
+											stagger: 0.1,
+											duration: 0.8,
+											ease: "power3.out",
+										});
+									},
+								});
+							}
 
 							currentIndex = i;
 						}
 					},
 					onLeaveBack: () => {
-						if (i > 0 && currentIndex !== i - 1) {
-							const oldChildren =
-								leftTextRefs.current[currentIndex].querySelectorAll("h2, p");
-							const newChildren =
-								leftTextRefs.current[i - 1].querySelectorAll("h2, p");
+						if (i > 0 && currentIndex === i) {
+							const prevIndex = i - 1;
+							
+							if (leftTextRefs.current[currentIndex]) {
+								gsap.to(leftTextRefs.current[currentIndex], {
+									opacity: 0,
+									duration: 0.4,
+									ease: "power2.out",
+								});
+							}
+							
+							if (leftTextRefs.current[prevIndex]) {
+								const newChildren = leftTextRefs.current[prevIndex].querySelectorAll("h2, p");
+								gsap.set(newChildren, { opacity: 0, y: -20 });
 
-							gsap.to(leftTextRefs.current[currentIndex], {
-								opacity: 0,
-								duration: 0.6,
-								ease: "power2.out",
-							});
-							gsap.set(newChildren, { opacity: 0, y: -20 });
+								gsap.to(leftTextRefs.current[prevIndex], {
+									opacity: 1,
+									duration: 0.3,
+									onComplete: () => {
+										gsap.to(newChildren, {
+											opacity: 1,
+											y: 0,
+											stagger: 0.1,
+											duration: 0.8,
+											ease: "power3.out",
+										});
+									},
+								});
+							}
 
-							gsap.to(leftTextRefs.current[i - 1], {
-								opacity: 1,
-								duration: 0.3,
-								onComplete: () => {
-									gsap.to(newChildren, {
-										opacity: 1,
-										y: 0,
-										stagger: 0.15,
-										duration: 1.2,
-										ease: "power4.out",
-									});
-								},
-							});
-
-							currentIndex = i - 1;
+							currentIndex = prevIndex;
 						}
 					},
+					markers: false, // Set to true for debugging
 				});
+				
+				scrollTriggers.current.push(trigger);
 			});
 		});
 
@@ -265,7 +295,7 @@ setTimeout(() => {
 			imageRefs.current.forEach((imgEl) => {
 				gsap.set(imgEl, { opacity: 0 });
 
-				ScrollTrigger.create({
+				const trigger = ScrollTrigger.create({
 					trigger: imgEl,
 					start: "top 80%",
 					onEnter: () => {
@@ -283,15 +313,20 @@ setTimeout(() => {
 					},
 					once: true,
 				});
+				
+				scrollTriggers.current.push(trigger);
 			});
 		});
 
-		return () => mm.revert();
+		return () => {
+			mm.revert();
+			scrollTriggers.current.forEach(trigger => trigger.kill());
+		};
 	}, [details, isDesktop]);
 
 	return (
 		<div
-			className={`w-full my-10 md:my-16 lg:my-20 pt-10 px-1 transition-colors duration-300 ${darkMode ? " text-white" : " text-white"}`}
+			className={`w-full my-10 md:my-16 lg:my-20 pt-10 lg:mt-20 xl:mt-20 2xl:mt-20 3xl:mt-20 px-1 transition-colors duration-300 ${darkMode ? " text-white" : " text-white"}`}
 		>
 			{!isDesktop && (
 				<h1
@@ -302,128 +337,125 @@ setTimeout(() => {
 				</h1>
 			)}
 
-			<div className="lg:flex max-w-[1600px] 3xl:max-w-[1840px] mx-auto">
+			<div className="lg:flex max-w-[1600px] 3xl:max-w-[1840px] mx-auto items-start">
 				{isDesktop && (
-  <div
-    ref={leftColRef}
-    className="hidden lg:block w-full lg:w-1/2 px-6 h-screen sticky top-0"
-  >
-    <div className="flex flex-col h-full justify-start items-start pt-10 xl:pt-16 2xl:pt-16 3xl:pt-32">
-      <h1
-        className={`lg:text-5xl 2xl:text-7xl xl:text-6xl lg:tracking-wider xl:tracking-widest font-bold uppercase  mb-8 text-[#395299] leading-tight ${
-          darkMode ? "text-[#fbcc03]" : "text-[#395299]"
-        }`}
-      >
-        {title}
-      </h1>
+					<div
+						ref={leftColRef}
+						className="hidden lg:block w-full lg:w-1/2 px-6 sticky top-24 pt-8"
+					>
+						<div className="flex flex-col justify-start items-start">
+							<h1
+								className={`lg:text-5xl 2xl:text-7xl xl:text-6xl lg:tracking-wider xl:tracking-widest font-bold uppercase mb-8 text-[#395299] leading-tight ${
+									darkMode ? "text-[#fbcc03]" : "text-[#395299]"
+								}`}
+							>
+								{title}
+							</h1>
 
-      <div
-        ref={textContainerRef}
-        className="relative lg:h-[330px] xl:h-[480px] 2xl:h-[350px] 3xl:h-[600px] w-full max-w-[500px] 2xl:max-w-[500px] 3xl:max-w-[600px] xl:ml-[21%] 2xl:ml-[32%] 3xl:ml-[14%]"
-        style={{ willChange: "transform" }}
-      >
-        {details.map((sec, i) => (
-          <div
-            key={i}
-            ref={(el) => (leftTextRefs.current[i] = el)}
-            className="absolute top-0 left-0 w-full"
-          >
-            <p
-              className={`lg:text-[20px] xl:text-[22px] 3xl:text-[28px] tracking-widest ${
-                darkMode ? "text-gray-300" : "text-black font-medium"
-              }`}
-            >
-              {sec.description}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
-
+							<div
+								ref={textContainerRef}
+								className="relative w-full max-w-[500px] 2xl:max-w-[550px] 3xl:max-w-[600px] min-h-[200px]"
+								style={{ willChange: "transform" }}
+							>
+								{details.map((sec, i) => (
+									<div
+										key={i}
+										ref={(el) => (leftTextRefs.current[i] = el)}
+										className={`${i === 0 ? "" : "absolute"} top-0 left-0 w-full`}
+									>
+										<p
+											className={`lg:text-[20px] xl:text-[22px] 3xl:text-[28px] tracking-widest ${
+												darkMode ? "text-gray-300" : "text-black font-medium"
+											}`}
+										>
+											{sec.description}
+										</p>
+									</div>
+								))}
+							</div>
+						</div>
+					</div>
+				)}
 
 				<div className="w-full lg:w-1/2">
+					{isDesktop ? (
+						<div className="space-y-6">
+							{details.map((sec, i) => (
+								<div
+									key={i}
+									ref={(el) => (sectionRefs.current[i] = el)}
+									className="pb-2"
+								>
+									<div className="px-2 md:px-4">
+										<div
+											className={`rounded-3xl p-8 w-full max-w-[500px] xl:max-w-[650px] 2xl:max-w-[700px] 3xl:max-w-[900px] shadow-lg ${
+												darkMode ? "bg-black" : "bg-black border border-gray-200"
+											}`}
+										>
+											<div className="flex justify-between items-center mb-4">
+												<h3 className="text-2xl pb-3 font-semibold tracking-widest">
+													{sec.heading}
+												</h3>
+											</div>
+											<img
+												ref={(el) => (imageRefs.current[i] = el)}
+												src={sec.image || "/placeholder.svg"}
+												alt={sec.heading}
+												className="w-full h-auto aspect-video object-cover rounded-md md:rounded-xl"
+											/>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+					) : (
+						<div className="bg-black rounded-3xl mt-16 md:mt-20 mx-4 px-2 md:px-8 py-4 md:py-8 space-y-14 md:space-y-20">
+							{details.map((sec, i) => (
+								<div key={i}>
+									<button
+										onClick={() => toggleMobileSection(i)}
+										className="w-full text-left px-4 py-3 md:py-5 flex justify-between items-center rounded-xl text-white"
+									>
+										<h3 className="font-bold xxs:text-[16px] xs:text-[20px] md:text-[28px] tracking-widest">
+											{sec.heading}
+										</h3>
+										<ArrowUpRight
+											className={`md:w-12 md:h-12 w-8 h-8 transition-transform duration-300 ${
+												openMobileSections[i]
+													? "rotate-0 text-[#fbcc03]"
+													: "rotate-[90deg] text-gray-400"
+											}`}
+										/>
+									</button>
 
-
-{isDesktop ? (
-  details.map((sec, i) => (
-    <div
-      key={i}
-      ref={(el) => (sectionRefs.current[i] = el)}
-      className={`px-2 py-10 flex flex-col justify-center lg:h-[500px] xl:h-[600px] 3xl:h-[800px] items-center ${i === details.length - 1 ? "mb-[20vh]" : ""}`}
-    >
-      <div
-        className={`rounded-3xl p-8 w-full max-w-[500px] xl:max-w-[650px] 2xl:max-w-[700px] 3xl:max-w-[900px] shadow-lg ${darkMode ? "bg-black" : "bg-black border border-gray-200"}`}
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-2xl pb-3 font-semibold tracking-widest">
-            {sec.heading}
-          </h3>
-        </div>
-        
-        {/* ✅ UPDATED IMAGE (Desktop) */}
-        <img
-          ref={(el) => (imageRefs.current[i] = el)}
-          src={sec.image || "/placeholder.svg"}
-          alt={sec.heading}
-          className="w-full lg:h-[260px] xl:h-[350px] 2xl:h-[350px] 3xl:h-[420px] object-cover rounded-md md:rounded-xl"
-        />
-      </div>
-    </div>
-  ))
-) : (
-  <div className="bg-black rounded-3xl mt-16 md:mt-20 mx-4 px-2 md:px-8 py-4 md:py-8 space-y-14 md:space-y-20">
-    {details.map((sec, i) => (
-      <div key={i}>
-        <button
-          onClick={() => toggleMobileSection(i)}
-          className="w-full text-left px-4 py-3 md:py-5 flex justify-between items-center rounded-xl text-white"
-        >
-          <h3 className="font-bold xxs:text-[16px] xs:text-[20px] md:text-[28px] tracking-widest">
-            {sec.heading}
-          </h3>
-          <ArrowUpRight
-            className={`md:w-12 md:h-12 w-8 h-8 transition-transform duration-300 ${
-              openMobileSections[i]
-                ? "rotate-0 text-[#fbcc03]"
-                : "rotate-[90deg] text-gray-400"
-            }`}
-          />
-        </button>
-
-        <div
-          ref={(el) => (mobileContentRef.current[i] = el)}
-          className="overflow-hidden"
-          style={{ display: "none" }}
-        >
-          <div className="mt-4 px-2 text-center">
-            <div
-              ref={(el) => (mobileImageRef.current[i] = el)}
-              className="overflow-hidden rounded-3xl mb-3"
-            >
-              
-              {/* ✅ UPDATED IMAGE (Mobile) */}
-              <img
-                src={sec.image || "/placeholder.svg"}
-                alt={sec.heading}
-                className="w-full h-[180px] sm:h-[280px] md:h-[350px] object-cover"
-              />
-            </div>
-            <p
-              ref={(el) => (mobileTextRef.current[i] = el)}
-              className="text-[16px] md:text-[20px]  text-gray-300 text-left"
-            >
-              {sec.description}
-            </p>
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-)}
-
-
+									<div
+										ref={(el) => (mobileContentRef.current[i] = el)}
+										className="overflow-hidden"
+										style={{ display: "none" }}
+									>
+										<div className="mt-4 px-2 text-center">
+											<div
+												ref={(el) => (mobileImageRef.current[i] = el)}
+												className="overflow-hidden rounded-3xl mb-3"
+											>
+												<img
+													src={sec.image || "/placeholder.svg"}
+													alt={sec.heading}
+													className="w-full h-[180px] sm:h-[280px] md:h-[350px] object-cover"
+												/>
+											</div>
+											<p
+												ref={(el) => (mobileTextRef.current[i] = el)}
+												className="text-[16px] md:text-[20px] text-gray-300 text-left"
+											>
+												{sec.description}
+											</p>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
