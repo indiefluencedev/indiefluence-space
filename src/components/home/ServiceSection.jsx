@@ -214,7 +214,7 @@ export default function ServicesSection() {
 													<img
 														src={service.image}
 														alt={service.title}
-														className=" w-full h-full md:w-[90%]  md:h-[90%] object-contain rounded-lg"
+														className=" w-full h-full md:w-[90%]  md:h-[90%] 3xl:h-[700px] object-contain rounded-lg"
 													/>
 												</div>
 											</div>
