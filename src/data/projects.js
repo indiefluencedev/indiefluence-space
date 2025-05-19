@@ -4,7 +4,7 @@ export const projects = {
       id: 1,
       title: "E-Commerce Platform",
       description: "A modern e-commerce platform with real-time inventory management and AI-powered product recommendations that increased conversion rates by 24%.",
-      image: "/projects/website1.jpg",
+      image: "/png/services/Artlukas.jpg",
       technologies: ["Next.js", "Node.js", "MongoDB", "Redis", "Stripe API"],
       link: "https://example.com/project1"
     },
@@ -12,7 +12,7 @@ export const projects = {
       id: 2,
       title: "Portfolio Website",
       description: "Creative portfolio website with immersive 3D elements and smooth animations that showcase creative work in an innovative way.",
-      image: "/projects/website2.jpg",
+      image: "/png/services/download2.jpg",
       technologies: ["React", "GSAP", "Tailwind", "Three.js", "Framer Motion"],
       link: "https://example.com/project2"
     },
@@ -20,7 +20,7 @@ export const projects = {
       id: 3,
       title: "Corporate Dashboard",
       description: "Real-time analytics dashboard with customizable widgets and predictive analysis for business intelligence.",
-      image: "/projects/website3.jpg",
+      image: "/png/services/Artlukas.jpg",
       technologies: ["Vue.js", "D3.js", "Firebase", "GraphQL", "TensorFlow.js"],
       link: "https://example.com/project3"
     },
@@ -28,7 +28,7 @@ export const projects = {
       id: 4,
       title: "Healthcare Portal",
       description: "Secure patient management system with telemedicine capabilities and integration with wearable health devices.",
-      image: "/projects/website4.jpg",
+      image: "/png/services/download2.jpg",
       technologies: ["Angular", "Express", "PostgreSQL", "WebRTC", "OAuth"],
       link: "https://example.com/project4"
     },
@@ -36,7 +36,7 @@ export const projects = {
       id: 5,
       title: "Educational Platform",
       description: "Interactive learning platform with gamification elements and personalized learning paths based on student performance.",
-      image: "/projects/website5.jpg",
+      image: "/png/services/Artlukas.jpg",
       technologies: ["React", "Node.js", "MongoDB", "Socket.io", "AWS"],
       link: "https://example.com/project5"
     },
@@ -44,7 +44,7 @@ export const projects = {
       id: 6,
       title: "Real Estate Marketplace",
       description: "Property listing platform with virtual tours and AI-powered valuation tools for accurate property pricing.",
-      image: "/projects/website6.jpg",
+      image: "/png/services/download2.jpg",
       technologies: ["Next.js", "Django", "PostgreSQL", "Mapbox", "WebGL"],
       link: "https://example.com/project6"
     },
@@ -52,7 +52,7 @@ export const projects = {
       id: 7,
       title: "Travel Booking App",
       description: "Comprehensive travel booking solution with personalized recommendations and carbon footprint tracking.",
-      image: "/projects/website7.jpg",
+      image: "/png/services/Artlukas.jpg",
       technologies: ["React Native", "GraphQL", "MongoDB", "Redis", "Stripe"],
       link: "https://example.com/project7"
     }

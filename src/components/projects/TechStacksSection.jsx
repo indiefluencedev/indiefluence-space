@@ -1,4 +1,4 @@
-// src/components/projects/TechStacksSection.jsx
+// ************************ this component is used for heading button *************************** //
 "use client";
 
 import { useState } from "react";

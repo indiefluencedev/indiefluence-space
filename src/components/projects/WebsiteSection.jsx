@@ -1,4 +1,3 @@
-// app/components/WebsiteSection.jsx
 "use client";
 import { useRef, useLayoutEffect } from "react";
 import { gsap } from "gsap";
@@ -11,53 +10,59 @@ export default function WebsiteSection({ projects }) {
 
   useLayoutEffect(() => {
     const container = containerRef.current;
-    // Define the sections (project blocks)
     const sections = gsap.utils.toArray(".project-block", container);
 
-    // Pin each section until the next one comes in to create stacking overlap
     sections.forEach((section, index) => {
-      if (index === sections.length - 1) return; // Skip pinning the last block
+      if (index === sections.length - 1) return;
+
       ScrollTrigger.create({
         trigger: section,
-        start: "top top",         // when this block's top hits top of viewport
-        end: "bottom top",        // when this block's bottom hits top of viewport
+        start: "top top",
+        end: "bottom top+=100", // ends a bit earlier to reveal heading/image of previous
         pin: true,
-        pinSpacing: false        // allow next section to overlap without extra space
+        pinSpacing: false,
+        markers: false,
       });
-    });
 
-    // Parallax effect: image moves slower than scroll, previous image stays partly visible
-    sections.forEach((section) => {
-      const img = section.querySelector(".project-image");
-      if (img) {
-        gsap.to(img, {
-          y: "-20%",  // move image upward slowly (20% of its height) 
-          scrollTrigger: {
-            trigger: section,
-            start: "top center",    // start parallax when section enters center
-            end: "bottom top",      // end when section leaves top
-            scrub: true             // smooth continuous animation tied to scroll
-          }
+      // Add margin-top to the *next* section so this one stays visible partially
+      if (sections[index + 1]) {
+        gsap.set(sections[index + 1], {
+          paddingTop: "50px", // space for previous heading + partial image
         });
       }
     });
 
-    // Clean up ScrollTriggers on unmount
+    // Parallax effect: image moves slower than scroll
+    sections.forEach((section) => {
+      const img = section.querySelector(".project-image");
+      if (img) {
+        gsap.to(img, {
+          y: "-20%",
+          scrollTrigger: {
+            trigger: section,
+            start: "top center",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
+    });
+
     return () => {
-      ScrollTrigger.getAll().forEach(trig => trig.kill());
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, []);  // empty dependency ensures this runs once on mount
+  }, []);
 
   return (
     <div ref={containerRef} className="relative w-full">
       {projects.map((proj, idx) => (
-        <ProjectBlock 
-          key={idx} 
-          title={proj.title} 
-          description={proj.description} 
-          image={proj.image} 
+        <ProjectBlock
+          key={idx}
+          title={proj.title}
+          description={proj.description}
+          image={proj.image}
           link={proj.link}
-          // You might pass index if needed for animation offsets
+          isLast={idx === projects.length - 1}
         />
       ))}
     </div>

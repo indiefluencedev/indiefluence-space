@@ -1,4 +1,4 @@
-// app/components/CategoryTabs.jsx
+// ************************ this component is used for buttons ui design *************************** //
 import React from "react";
 
 export default function CategoryTabs({ active, onSelect }) {
@@ -10,7 +10,7 @@ export default function CategoryTabs({ active, onSelect }) {
           key={cat}
           onClick={() => onSelect(cat)}
           className={
-            "px-4 py-2 text-lg font-semibold rounded " +
+            "px-4 py-2 text-lg font-semibold rounded cursor-pointer " +
             (active === cat ? "bg-white text-gray-900" : "bg-gray-700 text-white")
           }
         >
