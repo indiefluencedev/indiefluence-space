@@ -2,6 +2,8 @@
 import { useState } from "react";
 import StackingSlides from "@/components/UI/StackingSlider";
 import { projects } from "@/data/projects";
+import { Heading } from "lucide-react";
+import HeadingComponent from "@/components/UI/HeadingComponent";
 
 export default function ProjectsPage() {
 	// State to track which project category is selected
@@ -12,6 +14,12 @@ export default function ProjectsPage() {
 
 	return (
 		<div className="min-h-screen">
+
+			<HeadingComponent
+				sectionLabel="PROJECTS"
+				title="My Projects"
+				icon={<Heading className="text-4xl" />}
+			/>
 			{/* Category selector */}
 			<div className="fixed top-4 left-0 right-0 z-50 flex justify-center gap-4 p-4">
 				{Object.keys(projects).map((category) => (
