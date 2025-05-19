@@ -1,5 +1,5 @@
 "use client";
-import { Carousel, Card } from "@/components/UI/cards-carousel";
+import { Carousel, Card } from "@/components/UI/Mutebox-cards-carousel";
 
 export default function AppleCardsCarouselDemo() {
 	const cards = data.map((card, index) => (

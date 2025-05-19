@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
 import { useTheme } from "@/context/TheamContext";
@@ -66,18 +67,6 @@ const SpinDialText = ({ text = "BUTTON", animate, duration = 0.5 }) => {
 			))}
 		</span>
 	);
-};
-
-// Base Button Styles
-const baseButtonStyles = {
-	display: "flex",
-	alignItems: "center",
-	justifyContent: "center",
-	fontSize: "1.1rem",
-	fontWeight: "bold",
-	borderRadius: "8px",
-	cursor: "pointer",
-	transition: "all 0.3s ease",
 };
 
 // Floating Particle Component
@@ -156,16 +145,30 @@ const FloatingParticles = ({ darkMode }) => {
 	);
 };
 
-// Button 4: QuantumButton - QUANTUMJUMP
+// Enhanced QuantumButton Component
 export const QuantumButton = ({
 	text = "QUANTUMJUMP",
-	onClick,
+	href = null,
+	onClick = null,
+	width = "300px",
+	height = "80px",
+	borderRadius = "8px",
+	fontSize = "1.1rem",
+	fontWeight = "bold",
 	className = "",
+	active = false,
+	disabled = false,
 }) => {
 	const { darkMode } = useTheme();
 	const [isAnimating, setIsAnimating] = useState(false);
+	const [isActive, setIsActive] = useState(active);
 	const buttonRef = useRef(null);
 	const particlesRef = useRef(null);
+
+	// Update active state when prop changes
+	useEffect(() => {
+		setIsActive(active);
+	}, [active]);
 
 	// Theme-aware colors
 	const bgColor = darkMode ? "#111827" : "white";
@@ -176,25 +179,45 @@ export const QuantumButton = ({
 		? "var(--primary-color)"
 		: "var(--secondary-color)";
 
+	// Active state styles
+	const activeStyles = isActive
+		? {
+				boxShadow: `0 0 15px ${darkMode ? "var(--primary-color)" : "var(--secondary-color)"}`,
+				transform: "scale(1.02)",
+				borderWidth: "3px",
+			}
+		: {};
+
+	// Disabled styles
+	const disabledStyles = disabled
+		? {
+				opacity: 0.5,
+				cursor: "not-allowed",
+			}
+		: {};
+
 	// Generate explosion particles
-	const explosionParticles = Array(30) // Increased from 15 to 30 for more visibility
+	const explosionParticles = Array(30)
 		.fill(0)
 		.map(() => ({
 			left: "50%",
 			top: "50%",
-			size: `${Math.random() * 5 + 2}px`, // Slightly larger particles
+			size: `${Math.random() * 5 + 2}px`,
 			angle: Math.random() * Math.PI * 2,
-			distance: Math.random() * 60 + 40, // Increased distance
+			distance: Math.random() * 60 + 40,
 		}));
 
 	const triggerAnimation = () => {
+		if (disabled) return;
+
 		setIsAnimating(true);
 		setTimeout(() => setIsAnimating(false), 1000);
 	};
 
 	// Animation effect
 	useEffect(() => {
-		if (!buttonRef.current || !particlesRef.current || !isAnimating) return;
+		if (!buttonRef.current || !particlesRef.current || !isAnimating || disabled)
+			return;
 
 		// Animate particles outward
 		Array.from(particlesRef.current.children).forEach((particle, index) => {
@@ -235,34 +258,49 @@ export const QuantumButton = ({
 			ease: "back.out(1.7)",
 			onComplete: () => {
 				gsap.to(buttonRef.current, {
-					scale: 1,
+					scale: isActive ? 1.02 : 1, // Return to active scale if active
 					duration: 0.3,
 				});
 			},
 		});
-	}, [isAnimating]);
+	}, [isAnimating, isActive, disabled]);
 
 	const handleClick = (e) => {
+		if (disabled) return;
+
 		triggerAnimation();
+
+		// Toggle active state if no external control
+		if (active === undefined) {
+			setIsActive(!isActive);
+		}
+
 		if (onClick) onClick(e);
 	};
 
-	return (
-		<button
-			ref={buttonRef}
-			style={{
-				...baseButtonStyles,
-				backgroundColor: bgColor,
-				color: textColor,
-				borderColor: darkMode
-					? "var(--primary-color)"
-					: "var(--secondary-color)",
-				borderWidth: "2px",
-			}}
-			className={`relative overflow-hidden rounded-md w-[300px] h-[80px] md:w-[300px] md:h-[80px] ${className}`}
-			onMouseEnter={triggerAnimation}
-			onClick={handleClick}
-		>
+	// Base button styles including custom props
+	const buttonStyles = {
+		backgroundColor: bgColor,
+		color: textColor,
+		borderColor: darkMode ? "var(--primary-color)" : "var(--secondary-color)",
+		borderWidth: isActive ? "3px" : "2px",
+		borderRadius: borderRadius,
+		width: width,
+		height: height,
+		fontSize: fontSize,
+		fontWeight: fontWeight,
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		cursor: disabled ? "not-allowed" : "pointer",
+		transition: "all 0.3s ease",
+		...activeStyles,
+		...disabledStyles,
+	};
+
+	// Create button content
+	const buttonContent = (
+		<>
 			{/* Floating Particles (always visible) */}
 			<FloatingParticles darkMode={darkMode} />
 
@@ -290,6 +328,35 @@ export const QuantumButton = ({
 			<div className="flex items-center justify-center relative z-10">
 				<SpinDialText text={text} animate={isAnimating} duration={0.3} />
 			</div>
+		</>
+	);
+
+	// Return Link or button based on href prop
+	if (href && !disabled) {
+		return (
+			<Link href={href} className={`relative overflow-hidden ${className}`}>
+				<div
+					ref={buttonRef}
+					style={buttonStyles}
+					onMouseEnter={() => !disabled && triggerAnimation()}
+					onClick={handleClick}
+				>
+					{buttonContent}
+				</div>
+			</Link>
+		);
+	}
+
+	return (
+		<button
+			ref={buttonRef}
+			style={buttonStyles}
+			className={`relative overflow-hidden ${className}`}
+			onMouseEnter={() => !disabled && triggerAnimation()}
+			onClick={handleClick}
+			disabled={disabled}
+		>
+			{buttonContent}
 		</button>
 	);
 };

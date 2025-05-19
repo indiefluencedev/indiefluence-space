@@ -78,7 +78,6 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
 										duration: 0.5,
 										delay: 0.2 * index,
 										ease: "easeOut",
-										once: true,
 									},
 								}}
 								key={"card" + index}
@@ -111,9 +110,21 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
 };
 
 export const Card = ({ card, index }) => {
+	const [mediaError, setMediaError] = useState(false);
+	const isGif = card.src && card.src.toLowerCase().endsWith(".gif");
+	const isVideo =
+		card.src &&
+		(card.src.toLowerCase().endsWith(".mp4") ||
+			card.src.toLowerCase().includes("giphy.gif"));
+
 	// Function to handle redirection to Instagram
 	const handleRedirect = () => {
 		window.open(card.redirectUrl, "_blank");
+	};
+
+	// Handle media loading errors
+	const handleMediaError = () => {
+		setMediaError(true);
 	};
 
 	return (
@@ -130,23 +141,37 @@ export const Card = ({ card, index }) => {
 					{card.title}
 				</motion.p>
 			</div>
-			{/* GIF element with autoplay */}
+			{/* Media container */}
 			<div className="absolute inset-0 z-10">
-				<video
-					autoPlay
-					loop
-					muted
-					playsInline
-					className="h-full w-full object-cover"
-				>
-					<source src={card.src} type="video/mp4" />
-					{/* Fallback for browsers that don't support video */}
+				{isVideo && !mediaError ? (
+					<video
+						autoPlay
+						loop
+						muted
+						playsInline
+						className="h-full w-full object-cover"
+						onError={handleMediaError}
+					>
+						<source src={card.src} type="video/mp4" />
+						{/* Fallback if video fails */}
+						<img
+							src="/api/placeholder/400/600"
+							alt={card.title}
+							className="h-full w-full object-cover"
+						/>
+					</video>
+				) : isGif && !mediaError ? (
 					<img
-						src={card.src || "/placeholder.svg"}
+						src={card.src}
 						alt={card.title}
 						className="h-full w-full object-cover"
+						onError={handleMediaError}
 					/>
-				</video>
+				) : (
+					<div className="flex h-full w-full items-center justify-center bg-gray-200 dark:bg-gray-800">
+						<p className="text-sm text-gray-500">{card.title}</p>
+					</div>
+				)}
 			</div>
 		</motion.button>
 	);
