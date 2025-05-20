@@ -24,7 +24,7 @@ export default function Projects() {
 
 			<HeadingComponent title="Projects" />
 
-			<div className="w-full h-[80px]  text-white flex flex-col items-center justify-center space-y-6">
+			<div className="w-full h-[80px]  text-white flex flex-col items-center justify-center space-y-6 my-10">
 				{/* Buttons */}
 				<CategoryTabs active={activeCategory} onSelect={handleSelectCategory} />
 

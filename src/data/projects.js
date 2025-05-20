@@ -42,7 +42,7 @@ export const projects = {
     },
     {
       id: 6,
-      title: "Real Estate Marketplace",
+      title: "Chalet Estate",
       description: "Property listing platform with virtual tours and AI-powered valuation tools for accurate property pricing.",
       image: "/png/services/download2.jpg",
       technologies: ["Next.js", "Django", "PostgreSQL", "Mapbox", "WebGL"],
