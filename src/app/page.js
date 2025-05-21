@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroSection from "@/components/home/HeroSection";
 import StraightSection from "@/components/home/ServiceSection";
-import { QuantumButton } from "@/components/UI/SpinDielButton";
+import { QuantumButton } from "@/components/UI/QuantumButton";
 import ClientsTestimonialsSection from "@/components/home/ClientsTestimonialsSection";
 
 import ClientSlider from "@/components/reusablesection/ClientSlider";

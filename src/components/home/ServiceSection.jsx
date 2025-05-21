@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { QuantumButton } from "../UI/SpinDielButton";
+import { QuantumButton } from "../UI/QuantumButton";
 import { useTheme } from "@/context/TheamContext";
 import { useRouter } from "next/navigation";
 import HeadingComponent from "../UI/HeadingComponent";

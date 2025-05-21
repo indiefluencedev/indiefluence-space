@@ -47,6 +47,11 @@
 	);
 	--border-color: rgb(var(--foreground-rgb), 0.2);
 
+	--secondary-bg-light: #ffffff; /* Light gray for light mode */
+	--secondary-bg-dark: #141920; /* Darker gray for dark mode */
+
+	/* Active state */
+
 	/* Theme hover states - add these */
 	--hover-bg-light: #000000;
 	--hover-text-light: #ffffff;
@@ -60,12 +65,15 @@
 	--hover-bg: var(--hover-bg-light);
 	--hover-text: var(--hover-text-light);
 	--hover-border: var(--hover-border-light);
+	--secondary-bg: var(--secondary-bg-light);
 }
 
 [data-dark-mode="true"] {
 	--foreground-rgb: 255, 255, 255;
 	--background-start-rgb: 17, 24, 39;
 	--background-end-rgb: 17, 24, 39;
+
+	--secondary-bg: var(--secondary-bg-dark);
 	--primary-color: #fbcc03;
 	--secondary-color: #395299;
 	color-scheme: dark only;
@@ -82,6 +90,10 @@
 
 .bg-default {
 	background: var(--bg-color);
+}
+.bg-secondary {
+	background-color: var(--secondary-bg);
+	transition: background-color 0.3s ease;
 }
 
 .border-default {

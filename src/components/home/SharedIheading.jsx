@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
-import { QuantumButton } from "../UI/SpinDielButton";
+import { QuantumButton } from "../UI/QuantumButton";
 gsap.registerPlugin(TextPlugin);
 
 // Hoverable Letter component for interactive text - now respects theme

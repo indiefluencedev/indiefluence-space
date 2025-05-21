@@ -285,7 +285,7 @@ export default function ClientTestimonials() {
 									<div className="relative w-full h-full flex flex-col md:flex-row items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8 z-10">
 										{/* Image Container - Left side */}
 										<div className="w-full md:w-1/2 flex items-center justify-center mb-4 md:mb-0">
-											<div className="w-[90%] aspect-square max-w-md lg:max-w-none lg:w-[85%]">
+											<div className="w-[90%] 2xl:w-[700px] 2xl:h-[700px] aspect-square max-w-md lg:max-w-none lg:w-[85%]">
 												<div className="relative w-full h-full shadow-2xl">
 													<img
 														src={testimonial.image}
