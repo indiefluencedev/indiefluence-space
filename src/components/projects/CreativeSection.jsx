@@ -1,12 +1,19 @@
-// components/CreativeSection.jsx
 "use client";
 
 import React, { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { creative } from "../../data/creative"; // adjust the path if needed
+import { creative } from "../../data/creative";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// 👇 Dynamic visible cards helper based on screen width
+const visibleCards = () => {
+  const width = window.innerWidth;
+  if (width >= 1024) return 3;     // Desktop
+  if (width >= 768) return 2;      // Tablet
+  return 1.2;                      // Mobile
+};
 
 const CreativeSection = () => {
   const containerRef = useRef(null);
@@ -17,7 +24,7 @@ const CreativeSection = () => {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Carousel setup for each card
+      // Initialize image tracks
       creative.forEach((_, i) => {
         currentImageIndex.current[i] = 1;
         if (imageTrackRefs.current[i]) {
@@ -25,24 +32,42 @@ const CreativeSection = () => {
         }
       });
 
+      const container = containerRef.current;
+      const track = trackRef.current;
       const totalCards = creative.length;
 
-      gsap.to(trackRef.current, {
-        xPercent: -100 * (totalCards - 3), // adjust for how many cards are visible
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: `+=${totalCards * 100}%`,
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-          snap: 1 / (totalCards - 1),
-        },
-      });
-    }, containerRef);
+      const resizeHandler = () => {
+        const cardsVisible = visibleCards();
+        const cardWidth = track.scrollWidth / totalCards;
 
-    return () => ctx.revert();
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+
+        gsap.to(track, {
+          x: () => {
+            const offsetBuffer = window.innerWidth < 768 ? 35 : 0; // Extra space on mobile
+            return -(cardWidth * (totalCards - cardsVisible)) - offsetBuffer;
+          },
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: container,
+            start: "top top",
+            end: () => `+=${track.scrollWidth - container.offsetWidth}`,
+            scrub: 1.5,
+            pin: track,
+            pinSpacing: true,
+            anticipatePin: 2,
+          },
+        });
+      };
+
+      resizeHandler();
+      window.addEventListener("resize", resizeHandler);
+
+      return () => {
+        window.removeEventListener("resize", resizeHandler);
+        ctx.revert();
+      };
+    }, containerRef);
   }, []);
 
   const showNextImage = (i) => {
@@ -82,64 +107,65 @@ const CreativeSection = () => {
   };
 
   return (
-    <section ref={containerRef} className="relative w-full h-[500px] overflow-hidden">
+    <section
+      ref={containerRef}
+      className="relative w-full overflow-hidden py-10"
+    >
       <div
         ref={trackRef}
-        className="flex flex-row h-full items-center"
+        className="flex flex-row h-[550px] lg:h-[500px] xl:h-[600px] 3xl:h-[800px] items-center"
       >
         {creative.map((card, i) => (
           <div
             key={card.id}
             ref={(el) => (cardRefs.current[i] = el)}
-            className="flex-shrink-0 w-full md:w-1/3 px-4"
+            className="flex-shrink-0 w-[90%] md:w-1/2 lg:w-1/3 px-[10px]"
           >
-            <div className="bg-gray-800 rounded-xl overflow-hidden relative group h-[500px]">
-  {/* Outer container to clip overflow */}
-  <div className="overflow-hidden w-full h-full">
-    {/* Sliding track with full width for each image */}
-    <div
-      ref={(el) => (imageTrackRefs.current[i] = el)}
-      className="flex h-full"
-      style={{ width: '100%', height: '100%' }}
-    >
-      {[card.posts[card.posts.length - 1], ...card.posts, card.posts[0]].map((img, j) => (
-        <div
-          key={j}
-          className="w-full h-full shrink-0 overflow-hidden"
-          style={{ flex: '0 0 100%' }}
-        >
-          <img
-            src={img.postImage}
-            alt=""
-            className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-500 overflow-hidden"
-            draggable="false"
-          />
-        </div>
-      ))}
-    </div>
-  </div>
+            <div className="bg-gray-800 rounded-xl overflow-hidden relative group h-[500px] lg:h-[450px] xl:h-[550px] 3xl:h-[800px]">
+              {/* Image Carousel */}
+              <div className="overflow-hidden w-full h-full">
+                <div
+                  ref={(el) => (imageTrackRefs.current[i] = el)}
+                  className="flex h-full"
+                  style={{ width: '100%', height: '100%' }}
+                >
+                  {[card.posts[card.posts.length - 1], ...card.posts, card.posts[0]].map((img, j) => (
+                    <div
+                      key={j}
+                      className="w-full h-full shrink-0 overflow-hidden"
+                      style={{ flex: '0 0 100%' }}
+                    >
+                      <img
+                        src={img.postImage}
+                        alt=""
+                        className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-500"
+                        draggable="false"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-  {/* Navigation Arrows */}
-  <button
-    onClick={() => showPrevImage(i)}
-    className="absolute left-2 top-1/2 -translate-y-1/2 text-7xl text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
-  >
-    &#8249;
-  </button>
-  <button
-    onClick={() => showNextImage(i)}
-    className="absolute right-2 top-1/2 -translate-y-1/2 text-7xl text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
-  >
-    &#8250;
-  </button>
+              {/* Navigation Arrows */}
+              <button
+                onClick={() => showPrevImage(i)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 text-7xl text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                &#8249;
+              </button>
+              <button
+                onClick={() => showNextImage(i)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-7xl text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                &#8250;
+              </button>
 
-  {/* Description */}
-  <div className="p-4 bg-opacity-50 absolute bottom-0 left-0 w-full text-white">
-    <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-    <p className="text-sm leading-snug">{card.description}</p>
-  </div>
-</div>
-
+              {/* Description */}
+              <div className="p-4 bg-opacity-50 absolute bottom-0 left-0 w-full text-white">
+                <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                <p className="text-sm leading-snug">{card.description}</p>
+              </div>
+            </div>
           </div>
         ))}
       </div>
