@@ -289,7 +289,7 @@ const FullscreenNav = () => {
 		{ id: "02", label: "About", href: "/about" },
 		{ id: "03", label: "Services", href: "#", hasDropdown: true },
 		{ id: "04", label: "Projects", href: "/projects" },
-		{ id: "05", label: "Expertise", href: "/expertise" },
+		// { id: "05", label: "Expertise", href: "/expertise" },
 		{ id: "06", label: "Contact", href: "/contact" },
 	];
 
