@@ -1,11 +1,11 @@
 import "./globals.css";
 import { Manrope, Orbitron } from "next/font/google";
 import { ThemeProvider } from "@/context/TheamContext";
-// import Navbar from "@/components/UI/Navbar";
 import Footer from "@/components/footer/Footer";
 import BackgroundEffects from "@/components/UI/BackgroundEffect";
 import Sidebar from "@/components/navbar/SideNavbar";
 import PixelTransition from "@/components/UI/PixelTransition";
+import SlowScrollWrapper from "@/components/UI/SlowScrollWrapper";
 
 const manrope = Manrope({
 	variable: "--font-manrope",
@@ -35,8 +35,10 @@ export default function RootLayout({ children }) {
 					<PixelTransition>
 						<BackgroundEffects />
 						<Sidebar />
-						<main className="relative z-10">{children}</main>
-						<Footer />
+						<SlowScrollWrapper speed={0.02}>
+							<main className="relative z-10">{children}</main>
+							<Footer />
+						</SlowScrollWrapper>
 					</PixelTransition>
 				</ThemeProvider>
 			</body>
