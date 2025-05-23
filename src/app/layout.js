@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
 					<PixelTransition>
 						<BackgroundEffects />
 						<Sidebar />
-						<SlowScrollWrapper speed={0.02}>
+						<SlowScrollWrapper speed={0.05}>
 							<main className="relative z-10">{children}</main>
 							<Footer />
 						</SlowScrollWrapper>
