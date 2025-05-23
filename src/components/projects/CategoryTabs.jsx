@@ -5,7 +5,7 @@ import { QuantumButton } from "@/components/UI/QuantumButton";
 
 // ************************ This component is used for buttons UI design *************************** //
 export default function CategoryTabs({ active, onSelect }) {
-	const categories = ["Website", "Creative", "Mute Box"];
+	const categories = ["Website", "Creative", "Mute Box", "StackingCards"];
 
 	return (
 		<div className="flex flex-wrap justify-center sm:space-x-6 gap-x-4 gap-y-4">
