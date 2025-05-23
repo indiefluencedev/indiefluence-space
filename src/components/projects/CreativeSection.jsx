@@ -1,73 +1,175 @@
 "use client";
 
-import React, { useRef, useLayoutEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { creative } from "../../data/creative";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// 👇 Dynamic visible cards helper based on screen width
-const visibleCards = () => {
-  const width = window.innerWidth;
-  if (width >= 1024) return 3;     // Desktop
-  if (width >= 768) return 2;      // Tablet
-  return 1.2;                      // Mobile
-};
-
 const CreativeSection = () => {
-  const containerRef = useRef(null);
+  const sectionRef = useRef(null);
   const trackRef = useRef(null);
   const cardRefs = useRef([]);
   const imageTrackRefs = useRef([]);
   const currentImageIndex = useRef([]);
+  const [isMobile, setIsMobile] = React.useState(false);
 
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      // Initialize image tracks
-      creative.forEach((_, i) => {
-        currentImageIndex.current[i] = 1;
-        if (imageTrackRefs.current[i]) {
-          gsap.set(imageTrackRefs.current[i], { xPercent: -100 });
-        }
-      });
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-      const container = containerRef.current;
-      const track = trackRef.current;
-      const totalCards = creative.length;
+  useEffect(() => {
+    const section = sectionRef.current;
+    const track = trackRef.current;
 
-      const resizeHandler = () => {
-        const cardsVisible = visibleCards();
-        const cardWidth = track.scrollWidth / totalCards;
+    if (!section || !track) return;
 
-        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    // Initialize carousel state
+    creative.forEach((_, i) => {
+      currentImageIndex.current[i] = 1;
+      if (imageTrackRefs.current[i]) {
+        gsap.set(imageTrackRefs.current[i], { xPercent: -100 });
+      }
+    });
 
-        gsap.to(track, {
-          x: () => {
-            const offsetBuffer = window.innerWidth < 768 ? 35 : 0; // Extra space on mobile
-            return -(cardWidth * (totalCards - cardsVisible)) - offsetBuffer;
-          },
-          ease: "power2.out",
+    // Calculate dynamic height based on viewport
+    const setDynamicHeight = () => {
+      const viewportHeight = window.innerHeight;
+      const minHeight = 600;
+      const idealHeight = Math.max(minHeight, viewportHeight * 0.85);
+      section.style.height = `${idealHeight}px`;
+    };
+
+    setDynamicHeight();
+
+    // Calculate the total scroll distance with proper padding
+    const getScrollDistance = () => {
+      const trackWidth = track.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      // Responsive padding: more for mobile, less for desktop
+      const extraPadding = viewportWidth < 768 ? viewportWidth * 0 : viewportWidth * 0.1;
+      return trackWidth - viewportWidth + extraPadding;
+    };
+
+    // Create smooth horizontal scroll animation with delays
+    const scrollDistance = getScrollDistance();
+    const scrollMultiplier = 1.2; // Slightly increase for better pacing
+    const delayAmount = 1000; // 1 second delay in pixels equivalent
+
+    const scrollTween = gsap.to(track, {
+      x: () => -scrollDistance,
+      ease: "none",
+      scrollTrigger: {
+        trigger: section,
+        start: "top top",
+        end: () => `+=${scrollDistance * scrollMultiplier + delayAmount * 2}`, // Add delay space at both ends
+        pin: true,
+        scrub: 2,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const progress = self.progress;
+          const totalDistance = scrollDistance;
+          const delayRatio = delayAmount / (scrollDistance * scrollMultiplier + delayAmount * 2);
+          
+          let adjustedProgress;
+          
+          if (progress <= delayRatio) {
+            // First delay period - stay at start
+            adjustedProgress = 0;
+          } else if (progress >= (1 - delayRatio)) {
+            // Last delay period - stay at end
+            adjustedProgress = 1;
+          } else {
+            // Normal scrolling with adjusted progress
+            adjustedProgress = (progress - delayRatio) / (1 - 2 * delayRatio);
+          }
+          
+          gsap.set(track, { x: -totalDistance * adjustedProgress });
+        },
+      },
+    });
+
+    // Animate individual cards as they come into view
+    cardRefs.current.forEach((el, index) => {
+      if (!el) return;
+
+      gsap.fromTo(
+        el,
+        { x: -50, opacity: 0.7 },
+        {
+          x: 0,
+          opacity: 1,
           scrollTrigger: {
-            trigger: container,
-            start: "top top",
-            end: () => `+=${track.scrollWidth - container.offsetWidth}`,
-            scrub: 1.5,
-            pin: track,
-            pinSpacing: true,
-            anticipatePin: 2,
+            trigger: el,
+            containerAnimation: scrollTween,
+            start: "left right",
+            end: "left center",
+            scrub: true,
           },
-        });
-      };
+        },
+      );
 
-      resizeHandler();
-      window.addEventListener("resize", resizeHandler);
+      const heading = el.querySelector("h3");
+      const description = el.querySelector("p");
 
-      return () => {
-        window.removeEventListener("resize", resizeHandler);
-        ctx.revert();
-      };
-    }, containerRef);
+      if (heading) {
+        gsap.fromTo(
+          heading,
+          { y: 30, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            scrollTrigger: {
+              trigger: el,
+              containerAnimation: scrollTween,
+              start: "left right+=100",
+              end: "left center",
+              scrub: true,
+            },
+          },
+        );
+      }
+
+      if (description) {
+        gsap.fromTo(
+          description,
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            scrollTrigger: {
+              trigger: el,
+              containerAnimation: scrollTween,
+              start: "left right+=100",
+              end: "left center",
+              scrub: true,
+            },
+          },
+        );
+      }
+    });
+
+    // Handle resize events
+    const handleResize = () => {
+      setDynamicHeight();
+      ScrollTrigger.refresh();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const showNextImage = (i) => {
@@ -108,18 +210,24 @@ const CreativeSection = () => {
 
   return (
     <section
-      ref={containerRef}
-      className="relative w-full overflow-hidden py-10"
+      ref={sectionRef}
+      className="relative w-full overflow-hidden py-10 3xl:pb-20 flex items-center justify-center min-h-screen"
     >
       <div
         ref={trackRef}
-        className="flex flex-row h-[550px] lg:h-[500px] xl:h-[600px] 3xl:h-[800px] items-center"
+        className="flex flex-row items-center"
+        style={{ 
+          height: "100%", 
+          minHeight: "500px", 
+          willChange: "transform",
+          paddingRight: isMobile ? "12vw" : "10vw" // More padding for mobile
+        }}
       >
         {creative.map((card, i) => (
           <div
             key={card.id}
             ref={(el) => (cardRefs.current[i] = el)}
-            className="flex-shrink-0 w-[90%] md:w-1/2 lg:w-1/3 px-[10px]"
+            className="flex-shrink-0 w-[100%] md:w-1/2 lg:w-1/3 px-[10px]"
           >
             <div className="bg-gray-800 rounded-xl overflow-hidden relative group h-[500px] lg:h-[450px] xl:h-[550px] 3xl:h-[800px]">
               {/* Image Carousel */}
