@@ -1,110 +1,110 @@
 "use client";
-import React, { useEffect, useState, createContext } from "react";
-import { IconArrowNarrowLeft, IconArrowNarrowRight } from "@tabler/icons-react";
+import React, { useEffect, useRef, useState, createContext } from "react";
+import { motion } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const CarouselContext = createContext({
 	currentIndex: 0,
 });
 
 export const Carousel = ({ items, initialScroll = 0 }) => {
-	const carouselRef = React.useRef(null);
-	const [canScrollLeft, setCanScrollLeft] = React.useState(false);
-	const [canScrollRight, setCanScrollRight] = React.useState(true);
+	const carouselRef = useRef(null);
+	const sectionRef = useRef(null);
 	const [currentIndex, setCurrentIndex] = useState(0);
 
 	useEffect(() => {
-		if (carouselRef.current) {
-			carouselRef.current.scrollLeft = initialScroll;
-			checkScrollability();
-		}
-	}, [initialScroll]);
+		const section = sectionRef.current;
+		const cardsContainer = carouselRef.current;
 
-	const checkScrollability = () => {
-		if (carouselRef.current) {
-			const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-			setCanScrollLeft(scrollLeft > 0);
-			setCanScrollRight(scrollLeft < scrollWidth - clientWidth);
-		}
-	};
+		if (!section || !cardsContainer) return;
 
-	const scrollLeft = () => {
-		if (carouselRef.current) {
-			carouselRef.current.scrollBy({ left: -300, behavior: "smooth" });
-		}
-	};
+		cardsContainer.scrollLeft = initialScroll;
 
-	const scrollRight = () => {
-		if (carouselRef.current) {
-			carouselRef.current.scrollBy({ left: 300, behavior: "smooth" });
-		}
-	};
+		const setDynamicHeight = () => {
+			const width = window.innerWidth;
+			let height;
 
-	const isMobile = () => {
-		return window && window.innerWidth < 768;
-	};
+			if (width < 640) {
+				height = 650; // mobile
+			} else if (width < 768) {
+				height = 400; // tablet portrait
+			} else if (width < 1024) {
+				height = 400; // tablet landscape
+			} else if (width < 1280) {
+				height = 700; // laptop
+			} else if (width < 1536) {
+				height = 740; // desktop
+			} else {
+				height = 900; // large screens
+			}
+
+			section.style.height = `${height}px`;
+		};
+
+		setDynamicHeight();
+
+		const scrollDistance = cardsContainer.scrollWidth - window.innerWidth;
+
+		gsap.to(cardsContainer, {
+			x: () => -scrollDistance,
+			ease: "none",
+			scrollTrigger: {
+				trigger: section,
+				start: "top top",
+				end: () => `+=${scrollDistance}`,
+				pin: true,
+				scrub: 2,
+				invalidateOnRefresh: true,
+				anticipatePin: 1,
+			},
+		});
+
+		window.addEventListener("resize", () => {
+			setDynamicHeight();
+			ScrollTrigger.refresh();
+		});
+
+		return () => {
+			ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+		};
+	}, [items]);
 
 	return (
 		<CarouselContext.Provider value={{ currentIndex }}>
-			<div className="relative w-full">
+			<section
+				ref={sectionRef}
+				className="w-full min-h-[600px] overflow-hidden relative"
+			>
 				<div
-					className="flex w-full overflow-x-scroll overscroll-x-auto scroll-smooth py-10 [scrollbar-width:none] md:py-20"
 					ref={carouselRef}
-					onScroll={checkScrollability}
+					className={cn(
+						"absolute top-0 left-0 h-full flex will-change-transform gap-4 pl-3 md:pl-4 xl:pl-[100px] 2xl:pl-[130px] 3xl:pl-[650px] md:mt-20 mt-10"
+					)}
 				>
-					<div
-						className={cn(
-							"absolute right-0 z-[1000] h-auto w-[5%] overflow-hidden bg-gradient-to-l",
-						)}
-					></div>
-
-					<div
-						className={cn(
-							"flex flex-row justify-start gap-4 pl-4",
-							"mx-auto max-w-7xl", // remove max-w-4xl if you want the carousel to span the full width of its container
-						)}
-					>
-						{items.map((item, index) => (
-							<motion.div
-								initial={{
-									opacity: 0,
-									y: 20,
-								}}
-								animate={{
-									opacity: 1,
-									y: 0,
-									transition: {
-										duration: 0.5,
-										delay: 0.2 * index,
-										ease: "easeOut",
-									},
-								}}
-								key={"card" + index}
-								className="rounded-3xl last:pr-[5%] md:last:pr-[33%]"
-							>
-								{item}
-							</motion.div>
-						))}
-					</div>
+					{items.map((item, index) => (
+						<motion.div
+							key={"card" + index}
+							initial={{ opacity: 0, y: 20 }}
+							animate={{
+								opacity: 1,
+								y: 0,
+								transition: {
+									duration: 0.5,
+									delay: 0.2 * index,
+									ease: "easeOut",
+								},
+							}}
+							className="rounded-3xl last:pr-3 md:last:pr-4 xl:last:pr-[10%]"
+						>
+							{item}
+						</motion.div>
+					))}
 				</div>
-				<div className="mr-10 flex justify-end gap-2">
-					<button
-						className="relative z-40 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 disabled:opacity-50"
-						onClick={scrollLeft}
-						disabled={!canScrollLeft}
-					>
-						<IconArrowNarrowLeft className="h-6 w-6 text-gray-500" />
-					</button>
-					<button
-						className="relative z-40 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 disabled:opacity-50"
-						onClick={scrollRight}
-						disabled={!canScrollRight}
-					>
-						<IconArrowNarrowRight className="h-6 w-6 text-gray-500" />
-					</button>
-				</div>
-			</div>
+			</section>
 		</CarouselContext.Provider>
 	);
 };
@@ -117,12 +117,10 @@ export const Card = ({ card, index }) => {
 		(card.src.toLowerCase().endsWith(".mp4") ||
 			card.src.toLowerCase().includes("giphy.gif"));
 
-	// Function to handle redirection to Instagram
 	const handleRedirect = () => {
 		window.open(card.redirectUrl, "_blank");
 	};
 
-	// Handle media loading errors
 	const handleMediaError = () => {
 		setMediaError(true);
 	};
@@ -130,7 +128,7 @@ export const Card = ({ card, index }) => {
 	return (
 		<motion.button
 			onClick={handleRedirect}
-			className="relative z-10 flex h-80 w-56 flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 md:h-[40rem] md:w-96 dark:bg-neutral-900 cursor-pointer transition-transform hover:scale-[1.02]"
+			className="relative z-10 flex w-80 md:w-96 h-[80vh] max-h-[40rem] flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 dark:bg-neutral-900 cursor-pointer transition-transform hover:scale-[1.02]"
 		>
 			<div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-full bg-gradient-to-b from-black/50 via-transparent to-transparent" />
 			<div className="relative z-40 p-8">
@@ -141,7 +139,6 @@ export const Card = ({ card, index }) => {
 					{card.title}
 				</motion.p>
 			</div>
-			{/* Media container */}
 			<div className="absolute inset-0 z-10">
 				{isVideo && !mediaError ? (
 					<video
@@ -153,7 +150,6 @@ export const Card = ({ card, index }) => {
 						onError={handleMediaError}
 					>
 						<source src={card.src} type="video/mp4" />
-						{/* Fallback if video fails */}
 						<img
 							src="/api/placeholder/400/600"
 							alt={card.title}

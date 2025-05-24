@@ -6,6 +6,7 @@ import CategoryTabs from "@/components/projects/CategoryTabs";
 import WebsiteSection from "@/components/projects/WebsiteSection";
 import CreativeSection from "@/components/projects/CreativeSection";
 import MuteBoxSection from "@/components/projects/MuteBoxSection";
+// import StackingCards from "@/components/projects/StackingCards";
 import StackingCards from "@/components/projects/StackingCards";
 
 // ✅ Correct import using named export
@@ -40,7 +41,7 @@ export default function Projects() {
 					<WebsiteSection projects={projectsData.websites} />
 				)}
 				{activeCategory === "StackingCards" && (
-					<StackingCards projects={projectsData.StackingCards} />
+					<	StackingCards projects={projectsData.StackingCards} />
 				)}
 				{activeCategory === "Creative" && (
 					<CreativeSection projects={projectsData.creative} />
