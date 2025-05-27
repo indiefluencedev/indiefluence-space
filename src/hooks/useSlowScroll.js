@@ -1,6 +1,5 @@
 "use client";
 
-// hooks/useSlowScroll.js
 import { useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -13,50 +12,54 @@ export const useSlowScroll = (speed = 0.5) => {
 		let targetScroll = window.scrollY;
 		let animationFrameId;
 		let isNavbarScroll = false;
+		let lastTouchY = 0;
+
+		const isTouchScreen =
+			typeof window !== "undefined" && "ontouchstart" in window;
 
 		const smoothScroll = () => {
-			// Only apply smooth scroll if not in navbar
 			if (!isNavbarScroll) {
-				// Calculate the difference between target and current scroll
 				const diff = targetScroll - currentScroll;
-
-				// Apply direct easing without velocity
 				currentScroll += diff * speed;
-
-				// Update scroll position
 				window.scrollTo(0, currentScroll);
 			}
-
-			// Continue animation
 			animationFrameId = requestAnimationFrame(smoothScroll);
 		};
 
-		// Start the animation loop
 		animationFrameId = requestAnimationFrame(smoothScroll);
 
 		const handleScroll = (e) => {
-			// Check if the scroll event is from the navbar
 			const target = e.target;
-			const isNavbar = target.closest('.navbar') ||
-						   target.closest('nav') ||
-						   target.closest('[role="navigation"]') ||
-						   target.closest('.fullscreen-nav');
+
+			// ✅ Fix: only call closest on Elements
+			if (!(target instanceof Element)) return;
+
+			const isNavbar =
+				target.closest(".navbar") ||
+				target.closest("nav") ||
+				target.closest('[role="navigation"]') ||
+				target.closest(".fullscreen-nav");
 
 			if (isNavbar) {
 				isNavbarScroll = true;
-				// Allow default scroll behavior for navbar
 				return;
 			}
 
 			isNavbarScroll = false;
-			// Prevent default scroll behavior for main content
 			e.preventDefault();
 
-			// Update target scroll position with reduced sensitivity
-			const scrollAmount = e.deltaY * 0.5;
-			targetScroll += scrollAmount;
+			if (e.type === "wheel") {
+				const scrollAmount = e.deltaY * 0.5;
+				targetScroll += scrollAmount;
+			} else if (e.type === "touchmove") {
+				const touchY = e.touches[0].clientY;
+				const deltaY = lastTouchY ? lastTouchY - touchY : 0;
+				lastTouchY = touchY;
 
-			// Ensure target scroll stays within bounds
+				const scrollFactor = isTouchScreen ? 3.5 : 1.5;
+				targetScroll += deltaY * scrollFactor;
+			}
+
 			targetScroll = Math.max(0, targetScroll);
 			targetScroll = Math.min(
 				targetScroll,
@@ -64,17 +67,25 @@ export const useSlowScroll = (speed = 0.5) => {
 			);
 		};
 
-		// Add scroll event listeners
+		const handleTouchEnd = () => {
+			lastTouchY = 0;
+		};
+
 		window.addEventListener("wheel", handleScroll, { passive: false });
 		window.addEventListener("touchmove", handleScroll, { passive: false });
+		window.addEventListener("touchend", handleTouchEnd, { passive: true });
 
-		// Reset isNavbarScroll when mouse leaves the navbar
 		const handleMouseLeave = (e) => {
 			const target = e.target;
-			const isNavbar = target.closest('.navbar') ||
-						   target.closest('nav') ||
-						   target.closest('[role="navigation"]') ||
-						   target.closest('.fullscreen-nav');
+
+			// ✅ Fix: only call closest on Elements
+			if (!(target instanceof Element)) return;
+
+			const isNavbar =
+				target.closest(".navbar") ||
+				target.closest("nav") ||
+				target.closest('[role="navigation"]') ||
+				target.closest(".fullscreen-nav");
 
 			if (!isNavbar) {
 				isNavbarScroll = false;
@@ -86,6 +97,7 @@ export const useSlowScroll = (speed = 0.5) => {
 		return () => {
 			window.removeEventListener("wheel", handleScroll);
 			window.removeEventListener("touchmove", handleScroll);
+			window.removeEventListener("touchend", handleTouchEnd);
 			document.removeEventListener("mouseleave", handleMouseLeave);
 			cancelAnimationFrame(animationFrameId);
 		};

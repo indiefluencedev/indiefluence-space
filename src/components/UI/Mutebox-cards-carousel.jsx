@@ -29,9 +29,9 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
 			let height;
 
 			if (width < 640) {
-				height = 650; // mobile
+				height = 680; // mobile
 			} else if (width < 768) {
-				height = 400; // tablet portrait
+				height = 500; // tablet portrait
 			} else if (width < 1024) {
 				height = 400; // tablet landscape
 			} else if (width < 1280) {
@@ -39,7 +39,7 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
 			} else if (width < 1536) {
 				height = 740; // desktop
 			} else {
-				height = 900; // large screens
+				height = 780; // large screens
 			}
 
 			section.style.height = `${height}px`;
@@ -49,17 +49,19 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
 
 		const scrollDistance = cardsContainer.scrollWidth - window.innerWidth;
 
+		// ✅ UPDATED: scroll starts only when fully visible
 		gsap.to(cardsContainer, {
 			x: () => -scrollDistance,
 			ease: "none",
 			scrollTrigger: {
 				trigger: section,
-				start: "top top",
+				start: "top top+=1", // ensure full visibility
 				end: () => `+=${scrollDistance}`,
 				pin: true,
 				scrub: 2,
 				invalidateOnRefresh: true,
 				anticipatePin: 1,
+				markers: false, // you can set true for debugging
 			},
 		});
 
@@ -77,7 +79,7 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
 		<CarouselContext.Provider value={{ currentIndex }}>
 			<section
 				ref={sectionRef}
-				className="w-full min-h-[600px] overflow-hidden relative"
+				className="w-full overflow-hidden relative"
 			>
 				<div
 					ref={carouselRef}
