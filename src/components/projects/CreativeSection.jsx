@@ -216,12 +216,11 @@ const CreativeSection = () => {
 
               {/* Title & Description */}
               <div className="absolute bottom-0 left-0 w-full bg-black/70 text-white">
-  <div className="p-4">
-    <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-    <p className="text-sm leading-snug">{card.description}</p>
-  </div>
-</div>
-
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                  <p className="text-sm leading-snug">{card.description}</p>
+                </div>
+              </div>
             </div>
           </div>
         ))}

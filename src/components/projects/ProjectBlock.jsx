@@ -63,7 +63,7 @@ export default function ProjectBlock({
 					</div>
 
 					{/* Right side — Rectangle Image */}
-					<div className="project-image-container flex items-center justify-center px-1 mt-12 md:mt-6 lg:mt-9 xl:mt-6 md:px-0 md:sticky top-0 z-10">
+					<div className="project-image-container flex items-center justify-center px-1 mt-12 md:mt-6 lg:mt-9 xl:mt-1 md:px-0 md:sticky top-0 z-10">
 						<img
 							src={image}
 							alt={title}
