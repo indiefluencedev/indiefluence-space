@@ -84,7 +84,7 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
 				<div
 					ref={carouselRef}
 					className={cn(
-						"absolute top-0 left-0 h-full flex will-change-transform gap-4 pl-3 md:pl-4 xl:pl-[100px] 2xl:pl-[130px] 3xl:pl-[650px] md:mt-20 mt-10"
+						"absolute top-0 left-0 h-full flex will-change-transform gap-4 pl-3 md:pl-4 xl:pl-[100px] 2xl:pl-[130px] 3xl:pl-[350px] 4xl:pl-[650px] md:mt-20 mt-10"
 					)}
 				>
 					{items.map((item, index) => (

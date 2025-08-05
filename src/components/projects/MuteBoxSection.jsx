@@ -8,7 +8,7 @@ export default function AppleCardsCarouselDemo() {
 
 	return (
 		<div className="w-full h-full py-10">
-			<h2 className="max-w-7xl pl-4 xl:pl-[100px] 2xl:pl-[130px] 3xl:pl-[650px] text-3xl md:text-5xl font-bold text-default font-sans">
+			<h2 className="max-w-7xl pl-4 xl:pl-[100px] 2xl:pl-[130px] 3xl:pl-[350px] 4xl:pl-[650px] text-3xl md:text-5xl font-bold text-default font-sans">
 				Trending Content
 			</h2>
 			<Carousel items={cards} />
