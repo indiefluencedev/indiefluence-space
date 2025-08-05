@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { creative } from "../../data/creative";
@@ -13,102 +13,144 @@ const CreativeSection = () => {
   const cardRefs = useRef([]);
   const imageTrackRefs = useRef([]);
   const currentImageIndex = useRef([]);
-  const [isMobile, setIsMobile] = React.useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
+  /* ---------- non-GSAP: detect mobile ---------- */
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const track = trackRef.current;
+  /* ---------- GSAP / ScrollTrigger setup ---------- */
+  useLayoutEffect(() => {
+    // Kill all existing ScrollTrigger instances first
+    ScrollTrigger.killAll();
 
-    if (!section || !track) return;
+    const ctx = gsap.context(() => {
+      const section = sectionRef.current;
+      const track = trackRef.current;
+      if (!section || !track) return;
 
-    creative.forEach((_, i) => {
-      currentImageIndex.current[i] = 1;
-      if (imageTrackRefs.current[i]) {
-        gsap.set(imageTrackRefs.current[i], { xPercent: -100 });
-      }
-    });
+      // Reset transforms before starting
+      gsap.set(track, { x: 0, clearProps: "all" });
+      gsap.set(section, { height: "auto", clearProps: "height" });
 
-    const setDynamicHeight = () => {
-      const width = window.innerWidth;
-      let height;
+      // Small delay to ensure DOM is ready
+      gsap.delayedCall(0.1, () => {
+        // Index bookkeeping + initial position
+        creative.forEach((_, i) => {
+          currentImageIndex.current[i] = 1;
+          if (imageTrackRefs.current[i]) {
+            gsap.set(imageTrackRefs.current[i], { xPercent: -100 });
+          }
+        });
 
-      if (width < 640) height = 680;
-      else if (width < 768) height = 500;
-      else if (width < 1024) height = 400;
-      else if (width < 1280) height = 700;
-      else if (width < 1536) height = 740;
-      else height = 780;
+        /* ------------ helpers ------------ */
+        const setDynamicHeight = () => {
+          const width = window.innerWidth;
+          let height;
+          if (width < 640) height = 680;
+          else if (width < 768) height = 500;
+          else if (width < 1024) height = 400;
+          else if (width < 1280) height = 700;
+          else if (width < 1536) height = 740;
+          else height = 780;
+          section.style.height = `${height}px`;
+        };
+        setDynamicHeight();
 
-      section.style.height = `${height}px`;
-    };
+        /* ------------ horizontal scroll ------------ */
+        const baseScrollDistance = track.scrollWidth - window.innerWidth;
+        const invisibleCardWidth =
+          window.innerWidth < 768
+            ? window.innerWidth * 0.8
+            : window.innerWidth < 1024
+            ? window.innerWidth * 0.4
+            : window.innerWidth * 0.2667;
+        const gapSize = 16;
+        const adjustedScrollDistance = baseScrollDistance + invisibleCardWidth + gapSize;
 
-    setDynamicHeight();
-
-    // Calculate scroll distance accounting for invisible cards
-    const baseScrollDistance = track.scrollWidth - window.innerWidth;
-    const invisibleCardWidth = window.innerWidth < 768 ? window.innerWidth * 0.8 : 
-                              window.innerWidth < 1024 ? window.innerWidth * 0.4 : 
-                              window.innerWidth * 0.2667;
-    const gapSize = 16; // gap-4 = 1rem = 16px
-    const adjustedScrollDistance = baseScrollDistance + invisibleCardWidth + gapSize;
-
-    gsap.to(track, {
-      x: () => -adjustedScrollDistance,
-      ease: "none",
-      scrollTrigger: {
-        trigger: section,
-        start: "top top+=1",
-        end: () => `+=${adjustedScrollDistance}`,
-        pin: true,
-        scrub: 2,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        markers: false,
-      },
-    });
-
-    cardRefs.current.forEach((el, index) => {
-      if (!el) return;
-
-      gsap.fromTo(
-        el,
-        { x: -50, opacity: 0.7 },
-        {
-          x: 0,
-          opacity: 1,
+        gsap.to(track, {
+          x: () => -adjustedScrollDistance,
+          ease: "none",
           scrollTrigger: {
-            trigger: el,
-            containerAnimation: ScrollTrigger.getById(section),
-            start: "left right",
-            end: "left center",
-            scrub: true,
+            trigger: section,
+            start: "top top+=1",
+            end: () => `+=${adjustedScrollDistance}`,
+            pin: true,
+            scrub: 2,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            markers: false,
+            id: "creative-horizontal-scroll",
+            onToggle: self => {
+              if (!self.isActive) {
+                gsap.set(track, { x: 0 });
+              }
+            }
           },
-        }
-      );
-    });
+        });
 
-    const handleResize = () => {
-      setDynamicHeight();
-      ScrollTrigger.refresh();
-    };
+        /* ------------ card fade-in ------------ */
+        cardRefs.current.forEach((el, index) => {
+          if (!el) return;
+          gsap.fromTo(
+            el,
+            { x: -50, opacity: 0.7 },
+            {
+              x: 0,
+              opacity: 1,
+              scrollTrigger: {
+                trigger: el,
+                containerAnimation: ScrollTrigger.getById("creative-horizontal-scroll"),
+                start: "left right",
+                end: "left center",
+                scrub: true,
+                id: `creative-card-${index}`,
+              },
+            },
+          );
+        });
 
-    window.addEventListener("resize", handleResize);
+        /* ------------ resize refresh ------------ */
+        const handleResize = () => {
+          setDynamicHeight();
+          ScrollTrigger.refresh();
+        };
+        window.addEventListener("resize", handleResize);
+
+        setIsInitialized(true);
+
+        /* ------ cleanup for this component only ------ */
+        return () => {
+          window.removeEventListener("resize", handleResize);
+        };
+      });
+    }, sectionRef);
+
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-      window.removeEventListener("resize", handleResize);
+      ctx.revert();
+      setIsInitialized(false);
+    };
+  }, []); // Remove dependencies to avoid re-initialization
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      ScrollTrigger.killAll();
+      if (sectionRef.current) {
+        gsap.set(sectionRef.current, { clearProps: "all" });
+      }
+      if (trackRef.current) {
+        gsap.set(trackRef.current, { clearProps: "all" });
+      }
     };
   }, []);
 
+  /* ---------- helper functions for arrows ---------- */
   const showNextImage = (i) => {
     const track = imageTrackRefs.current[i];
     const total = creative[i].posts.length;
@@ -162,19 +204,19 @@ const CreativeSection = () => {
           paddingRight: isMobile ? "0vw" : "0vw",
         }}
       >
-        {/* Invisible card before first */}
+        {/* Invisible spacer */}
         <div className="flex-shrink-0 w-[5%] md:w-[16.67%] invisible">
-          <div className="aspect-square max-w-[800px] w-full mx-auto"></div>
+          <div className="aspect-square max-w-[800px] w-full mx-auto" />
         </div>
 
         {creative.map((card, i) => (
           <div
             key={card.id}
             ref={(el) => (cardRefs.current[i] = el)}
-            className="flex-shrink-0 w-[100%] md:w-1/2 lg:w-1/3"
+            className="flex-shrink-0 w-[90%] md:w-1/2 lg:w-1/3"
           >
-            {/* Square Card */}
-            <div className="bg-gray-800 rounded-xl overflow-hidden relative group aspect-square max-w-[800px] w-full mx-auto">
+            {/* Card */}
+            <div className="bg-gray-800 rounded-xl overflow-hidden relative group aspect-square md:max-w-[800px] w-full mx-auto">
               <div className="overflow-hidden w-full h-full">
                 <div
                   ref={(el) => (imageTrackRefs.current[i] = el)}
@@ -195,12 +237,12 @@ const CreativeSection = () => {
                           draggable="false"
                         />
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </div>
 
-              {/* Prev/Next Buttons */}
+              {/* Prev / Next */}
               <button
                 onClick={() => showPrevImage(i)}
                 className="absolute left-2 top-1/2 -translate-y-1/2 text-7xl text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
@@ -214,7 +256,7 @@ const CreativeSection = () => {
                 &#8250;
               </button>
 
-              {/* Title & Description */}
+              {/* Caption */}
               <div className="absolute bottom-0 left-0 w-full bg-black/70 text-white">
                 <div className="p-4">
                   <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
@@ -225,9 +267,9 @@ const CreativeSection = () => {
           </div>
         ))}
 
-        {/* Invisible card after last */}
-        <div className="flex-shrink-0 w-[0] md:w-[6.67%] invisible">
-          <div className="aspect-square max-w-[800px] w-full mx-auto"></div>
+        {/* Invisible spacer */}
+        <div className="flex-shrink-0 w-0 md:w-[6.67%] invisible">
+          <div className="aspect-square max-w-[800px] w-full mx-auto" />
         </div>
       </div>
     </section>
