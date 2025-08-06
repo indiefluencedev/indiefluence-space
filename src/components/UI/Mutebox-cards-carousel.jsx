@@ -36,6 +36,10 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
       /* ── constants you can tweak ─────────────────────────── */
       const EXTRA_RIGHT         = 40;   // px so last card clears the gutter
       const SCROLL_SPEED_FACTOR = 1.4;  // >1  = slower horiz. motion
+
+      // Much shorter delays for better UX (reduced from 0.3 & 0.2)
+      const FIRST_CARD_DELAY    = 0.08; // ~8% of scroll for first card visibility
+      const LAST_CARD_PAUSE     = 0.06; // ~6% of scroll for last card pause
       /* ─────────────────────────────────────────────────────── */
 
       /* reset any stale inline styles */
@@ -61,24 +65,48 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
       };
       setDynamicHeight();
 
-      /* ── distances ───────────────────────────────────────── */
+      /* ── distances with delays ────────────────────────────── */
       const scrollDistanceX = track.scrollWidth - window.innerWidth + EXTRA_RIGHT;
-      const endDistanceY    = scrollDistanceX * SCROLL_SPEED_FACTOR;  // slower == larger
+      const baseEndDistance = scrollDistanceX * SCROLL_SPEED_FACTOR;
 
-      /* ── main tween ───────────────────────────────────────── */
-      gsap.to(track, {
-        x: () => -scrollDistanceX,
-        ease: "none",
+      // Add extra distance for first card delay and last card pause
+      const firstCardDelayDistance = baseEndDistance * FIRST_CARD_DELAY;
+      const lastCardPauseDistance = baseEndDistance * LAST_CARD_PAUSE;
+      const endDistanceY = baseEndDistance + firstCardDelayDistance + lastCardPauseDistance;
+
+      /* ── main tween with keyframes for delays ─────────────── */
+      const timeline = gsap.timeline({
         scrollTrigger: {
           id: "mutebox-carousel",
           trigger: section,
           start: "top top",
-          end:   () => `+=${endDistanceY}`,
+          end: () => `+=${endDistanceY}`,
           pin: true,
-          scrub: true,          // 1 : 1 tracking (smooth because endDistanceY is larger)
+          scrub: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
+      });
+
+      // Phase 1: Very short delay before first card starts moving
+      timeline.to(track, {
+        x: 0,
+        duration: FIRST_CARD_DELAY,
+        ease: "none"
+      });
+
+      // Phase 2: Main scrolling animation
+      timeline.to(track, {
+        x: () => -scrollDistanceX,
+        duration: 1 - FIRST_CARD_DELAY - LAST_CARD_PAUSE,
+        ease: "none"
+      });
+
+      // Phase 3: Short pause when last card is fully visible
+      timeline.to(track, {
+        x: () => -scrollDistanceX,
+        duration: LAST_CARD_PAUSE,
+        ease: "none"
       });
 
       /* keep everything responsive */
